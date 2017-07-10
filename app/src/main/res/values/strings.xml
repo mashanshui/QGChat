@@ -2,4 +2,15 @@
     <string name="app_name">QGChat</string>
     <string name="enter">进入首页</string>
     <string name="eye_of_agamotto">浅尝辄止</string>
+    <string name="chat_message">消息</string>
+    <string name="title_activity_aty_main">AtyMain</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

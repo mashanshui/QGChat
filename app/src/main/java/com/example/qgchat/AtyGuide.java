@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -32,6 +33,7 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
     private List<View> viewList;
     private Button btnTomain;
     private GuideAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

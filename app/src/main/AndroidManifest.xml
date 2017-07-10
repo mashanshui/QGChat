@@ -8,15 +8,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AtyWelcome">
+        <activity android:name=".AtyWelcome" />
+        <activity android:name=".AtyGuide" />
+        <activity android:name=".AtyLoginOrRegister"></activity>
+        <activity
+            android:name=".AtyMain">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AtyGuide" />
-        <activity android:name=".AtyMain"></activity>
     </application>
 
 </manifest>
