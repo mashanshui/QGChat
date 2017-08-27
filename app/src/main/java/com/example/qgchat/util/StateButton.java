@@ -1,4 +1,4 @@
-package com.example.qgchat;
+package com.example.qgchat.util;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -11,6 +11,8 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
+
+import com.example.qgchat.R;
 
 /**
  * @author deadline

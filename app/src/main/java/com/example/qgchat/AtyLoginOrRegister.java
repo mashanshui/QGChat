@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.qgchat.util.StateButton;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import butterknife.BindView;

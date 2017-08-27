@@ -2,8 +2,11 @@
     <string name="app_name">QGChat</string>
     <string name="enter">进入首页</string>
     <string name="eye_of_agamotto">浅尝辄止</string>
-    <string name="chat_message">消息</string>
     <string name="title_activity_aty_main">AtyMain</string>
+
+    <string name="title_message">消息</string>
+    <string name="title_person">联系人</string>
+    <string name="title_condition">动态</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

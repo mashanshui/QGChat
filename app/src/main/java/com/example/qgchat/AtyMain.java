@@ -1,9 +1,9 @@
 package com.example.qgchat;
 
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -15,17 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
+import com.example.qgchat.util.UltimateBar;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,27 +32,48 @@ public class AtyMain extends AppCompatActivity
 
     @BindView(R.id.vp_main)
     ViewPager viewPager;
-    @BindView(R.id.tl_main)
-    TabLayout tabLayout;
     @BindView(R.id.title_text)
     TextView titleText;
-    private List<TabLayout.Tab> tabList;
+    @BindView(R.id.navigation)
+    BottomNavigationView bottomNavigationView;
+
+    private MenuItem menuItem;
+
+    //BottomNavigationView的监听事件
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    //点击菜单项时跳转ViewPage
+                    viewPager.setCurrentItem(0);
+                    return true;
+                case R.id.navigation_dashboard:
+                    viewPager.setCurrentItem(1);
+                    return true;
+                case R.id.navigation_notifications:
+                    viewPager.setCurrentItem(2);
+                    return true;
+            }
+            return false;
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aty_main);
-        ViewGroup contentFrameLayout = (ViewGroup) findViewById(Window.ID_ANDROID_CONTENT);
-        View parentView = contentFrameLayout.getChildAt(0);
-        if (parentView != null && Build.VERSION.SDK_INT >= 14) {
-            parentView.setFitsSystemWindows(true);
-        }
+        UltimateBar ultimateBar = new UltimateBar(this);
+        ultimateBar.setColorBarForDrawer(ContextCompat.getColor(this, R.color.colorPrimary));
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
-        titleText.setText(R.string.chat_message);
+        titleText.setText("消息");
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -75,19 +93,42 @@ public class AtyMain extends AppCompatActivity
     }
 
     private void initViews() {
-        tabList = new ArrayList<>();
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         MainViewPageFragmentAdapter adapter = new MainViewPageFragmentAdapter(getSupportFragmentManager());
         adapter.addFragment(new LayoutChats());
         adapter.addFragment(new LayoutContacts());
         adapter.addFragment(new LayoutMoments());
         viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabList.add(tabLayout.getTabAt(0));
-        tabList.add(tabLayout.getTabAt(1));
-        tabList.add(tabLayout.getTabAt(2));
-        tabList.get(0).setIcon(R.drawable.icon).setText("Chats");
-        tabList.get(1).setIcon(R.drawable.icon).setText("Contacts");
-        tabList.get(2).setIcon(R.drawable.icon).setText("Moments");
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // 将当前的页面对应的底部标签设为选中状态
+                if (menuItem != null) {
+                    menuItem.setChecked(false);
+                } else {
+                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                }
+                menuItem = bottomNavigationView.getMenu().getItem(position);
+                menuItem.setChecked(true);
+                //设置标题
+                if (position==0) {
+                    titleText.setText(R.string.title_message);
+                } else if (position==1) {
+                    titleText.setText(R.string.title_person);
+                } else if (position==2) {
+                    titleText.setText(R.string.title_condition);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     @Override

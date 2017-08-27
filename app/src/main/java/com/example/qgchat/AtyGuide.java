@@ -2,15 +2,17 @@ package com.example.qgchat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.qgchat.adapter.GuideAdapter;
+import com.example.qgchat.util.UltimateBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +40,19 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aty_guide);
         ButterKnife.bind(this);
         initView();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            UltimateBar ultimateBar = new UltimateBar(this);
+            ultimateBar.setHintBar();
+        }
     }
 
     private void initView() {
@@ -50,6 +62,13 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
         View view1=inflater.inflate(R.layout.guide_page1, null);
         View view2=inflater.inflate(R.layout.guide_page2, null);
         View view3=inflater.inflate(R.layout.guide_page3, null);
+        ImageView guide_image1 = (ImageView) view1.findViewById(R.id.guide_image1);
+        ImageView guide_image2 = (ImageView) view2.findViewById(R.id.guide_image2);
+        ImageView guide_image3 = (ImageView) view3.findViewById(R.id.guide_image3);
+        Glide.with(this).load(R.drawable.shot1).into(guide_image1);
+        Glide.with(this).load(R.drawable.shot2).into(guide_image2);
+        Glide.with(this).load(R.drawable.shot3).into(guide_image3);
+
         viewList.add(view1);
         viewList.add(view2);
         viewList.add(view3);
@@ -66,6 +85,8 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AtyGuide.this, AtyMain.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
         });
