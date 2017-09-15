@@ -47,13 +47,13 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    /**
-     * @param c
-     * @param parent
-     * @param state
-     */
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+
+    }
+
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         if (dividerDrawable == null) {
             return;
         }
@@ -78,6 +78,5 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             dividerDrawable.draw(c);
         }
     }
-
 
 }

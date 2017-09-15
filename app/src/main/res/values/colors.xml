@@ -6,4 +6,5 @@
     <color name="white">#fff</color>
     <color name="colorRecycleViewClick">#bfbfbf</color>
     <color name="recycleViewDivider">#dcdcdc</color>
+    <color name="sendButtonColor">#b6b6b6</color>
 </resources>

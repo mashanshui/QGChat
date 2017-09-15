@@ -1,10 +1,9 @@
 package com.example.qgchat;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +11,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.qgchat.adapter.GuideAdapter;
+import com.example.qgchat.loginAndregister.AtyLogin;
 import com.example.qgchat.util.UltimateBar;
 
 import java.util.ArrayList;
@@ -20,8 +20,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChangeListener{
-
+public class AtyGuide extends BaseActivity implements ViewPager.OnPageChangeListener{
     @BindView(R.id.vp_guide)
     ViewPager viewPager;
     @BindView(R.id.iv_indicator_dot1)
@@ -35,7 +34,7 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
     private List<View> viewList;
     private Button btnTomain;
     private GuideAdapter adapter;
-
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +42,7 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aty_guide);
         ButterKnife.bind(this);
+        preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
         initView();
     }
 
@@ -53,6 +53,20 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
             UltimateBar ultimateBar = new UltimateBar(this);
             ultimateBar.setHintBar();
         }
+    }
+
+    private void goLogin() {
+        Intent intent = new Intent(AtyGuide.this, AtyLogin.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private void goHome() {
+        Intent intent = new Intent(AtyGuide.this, AtyMain.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void initView() {
@@ -84,10 +98,16 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
         btnTomain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AtyGuide.this, AtyMain.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+                SharedPreferences preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
+                /**
+                 * 是否登陆过，也就是是否有缓存的帐号密码
+                 */
+                boolean login = preferences.getBoolean("login", false);
+                if (login) {
+                    goHome();
+                } else {
+                    goLogin();
+                }
             }
         });
     }

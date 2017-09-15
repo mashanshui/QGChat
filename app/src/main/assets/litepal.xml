@@ -5,9 +5,11 @@
 
     <version value="1" />
 
-
     <list>
-
+        <mapping class="com.example.qgchat.db.DBUserGruop"></mapping>
+        <mapping class="com.example.qgchat.db.DBUserItemMsg"></mapping>
+        <mapping class="com.example.qgchat.db.DBUserList"></mapping>
+        <mapping class="com.example.qgchat.db.DBUserMoments"></mapping>
     </list>
 
 </litepal>

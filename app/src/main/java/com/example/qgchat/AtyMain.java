@@ -1,6 +1,9 @@
 package com.example.qgchat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -10,24 +13,27 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
 import com.example.qgchat.util.UltimateBar;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AtyMain extends AppCompatActivity
+public class AtyMain extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.vp_main)
@@ -36,6 +42,8 @@ public class AtyMain extends AppCompatActivity
     TextView titleText;
     @BindView(R.id.navigation)
     BottomNavigationView bottomNavigationView;
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
 
     private MenuItem menuItem;
 
@@ -87,9 +95,15 @@ public class AtyMain extends AppCompatActivity
         });
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        setNavigationHeadImage(R.drawable.headicon);
         navigationView.setNavigationItemSelectedListener(this);
         initViews();
+    }
+
+    private void setNavigationHeadImage(int drawable) {
+        View headView = navigationView.getHeaderView(0);
+        ImageView imageView = (ImageView) headView.findViewById(R.id.imageView);
+        Glide.with(this).load(drawable).into(imageView);
     }
 
     private void initViews() {
@@ -116,11 +130,11 @@ public class AtyMain extends AppCompatActivity
                 menuItem = bottomNavigationView.getMenu().getItem(position);
                 menuItem.setChecked(true);
                 //设置标题
-                if (position==0) {
+                if (position == 0) {
                     titleText.setText(R.string.title_message);
-                } else if (position==1) {
+                } else if (position == 1) {
                     titleText.setText(R.string.title_person);
-                } else if (position==2) {
+                } else if (position == 2) {
                     titleText.setText(R.string.title_condition);
                 }
             }
@@ -137,7 +151,10 @@ public class AtyMain extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
         }
     }
 
@@ -161,6 +178,26 @@ public class AtyMain extends AppCompatActivity
 //        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
+        if (menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return super.onPrepareOptionsPanel(view, menu);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

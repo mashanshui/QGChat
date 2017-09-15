@@ -1,6 +1,7 @@
 package com.example.qgchat.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import com.ajguan.library.LoadModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
+import com.example.qgchat.AtyChatRoom;
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
 import com.example.qgchat.bean.UserItemMsg;
@@ -27,6 +29,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static android.media.CamcorderProfile.get;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +44,8 @@ public class LayoutChats extends Fragment {
     @BindView(R.id.chatsRecycleView)
     RecyclerView chatsRecycleView;
     Unbinder unbinder;
+
+    private Intent intent;
 
     public LayoutChats() {
         // Required empty public constructor
@@ -89,7 +95,10 @@ public class LayoutChats extends Fragment {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-
+                UserItemMsg userItemMsg=userItemMsgList.get(position);
+                intent = new Intent(getActivity(), AtyChatRoom.class);
+                intent.putExtra("userItemMsg", userItemMsg);
+                startActivityForResult(intent,1);
             }
         });
         adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
@@ -99,9 +108,9 @@ public class LayoutChats extends Fragment {
                 return false;
             }
         });
+        chatsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(),R.drawable.recycleview_divider));
         chatsRecycleView.setAdapter(adapter);
         chatsRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        chatsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(),R.drawable.recycleview_divider));
     }
 
 

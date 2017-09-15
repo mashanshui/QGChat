@@ -124,17 +124,17 @@ public class UltimateBar {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             int alphaColor = alpha == 0 ? color : calculateColor(color, alpha);
             window.setStatusBarColor(alphaColor);
-            window.setNavigationBarColor(alphaColor);
+            //window.setNavigationBarColor(alphaColor);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window window = activity.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             int alphaColor = alpha == 0 ? color : calculateColor(color, alpha);
             ViewGroup decorView = (ViewGroup) window.getDecorView();
             decorView.addView(createStatusBarView(activity, alphaColor));
-            if (navigationBarExist(activity)) {
-                decorView.addView(createNavBarView(activity, alphaColor));
-                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            }
+//            if (navigationBarExist(activity)) {
+//                decorView.addView(createNavBarView(activity, alphaColor));
+//                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            }
             setRootView(activity, true);
         }
     }
