@@ -38,7 +38,7 @@ public class RegisterFragment2 extends Fragment {
     @BindView(R.id.btn_register)
     StateButton btnRegister;
     Unbinder unbinder;
-    public static String codeURL = "http://www.chemaxianxing.com/QGChatHttp/CheckMsg";
+    public static final String codeURL = "http://www.chemaxianxing.com/QGChatHttp/CheckMsg";
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAIL = 1;
     private String number=null;
@@ -80,9 +80,9 @@ public class RegisterFragment2 extends Fragment {
     public void onViewClicked() {
         code = edtCode.getText().toString();
         if (number != null && !number.equals("") && code!=null && !code.equals("")) {
-            codeURL=codeURL+"?number="+number+"&code="+code;
+            String url=codeURL+"?number="+number+"&code="+code;
             ((AtyRegister) getActivity()).showBufferDialog();
-            HttpUtil.sendOkHttpRequest(codeURL, new Callback() {
+            HttpUtil.sendOkHttpRequest(url, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Message message = new Message();

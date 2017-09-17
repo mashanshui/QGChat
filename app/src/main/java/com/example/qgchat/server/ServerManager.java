@@ -1,5 +1,9 @@
 package com.example.qgchat.server;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,12 +16,14 @@ import java.net.Socket;
 public class ServerManager extends Thread {
     private static final String TAG = "ServerManager";
     private static final String IP = "182.254.151.61";
-    public Socket socket=null;
-    private String account=null;
+    public Socket socket = null;
+    private String account = null;
     private String message = null;
-    private BufferedReader bufferedReader=null;
-    private BufferedWriter bufferedWriter=null;
+    private BufferedReader bufferedReader = null;
+    private BufferedWriter bufferedWriter = null;
     public ReceiveChatMsg receiveChatMsg;
+    public HandlerThread handlerThread = null;
+    public Handler handler = null;
     private static final ServerManager serverManager = new ServerManager();
 
     public static ServerManager getServerManager() {
@@ -26,14 +32,23 @@ public class ServerManager extends Thread {
 
     private ServerManager() {
         receiveChatMsg = new ReceiveChatMsg();
+        if (handlerThread == null) {
+            handlerThread = new HandlerThread("sendMessageThread");
+            handlerThread.start();
+        }
+        handler=new Handler(handlerThread.getLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                startSend(msg.obj.toString());
+            }
+        };
     }
 
     public void run() {
         try {
             socket = new Socket(IP, 27777);
-            bufferedReader =  new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-
             String m = null;
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -67,11 +82,10 @@ public class ServerManager extends Thread {
     }
 
 
-    public void sendMessage(String msg) {
+    private void startSend(String msg) {
         try {
             while (socket == null) ;
             if (bufferedWriter != null) {
-//                Log.d("TAG", "send : " + msg);
                 bufferedWriter.write(msg + "\n");
                 bufferedWriter.flush();
                 bufferedWriter.write("-1\n");
@@ -80,6 +94,12 @@ public class ServerManager extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendMessage(String msg){
+        Message tempMsg = handler.obtainMessage();
+        tempMsg.obj = msg.toString();
+        handler.sendMessage(tempMsg);
     }
 
     public String getMessage() {

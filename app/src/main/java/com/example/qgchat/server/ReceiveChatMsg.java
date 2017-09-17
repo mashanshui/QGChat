@@ -1,6 +1,10 @@
 package com.example.qgchat.server;
 
 
+import android.util.Log;
+
+import com.example.qgchat.loginAndregister.EventBean;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.regex.Matcher;
@@ -19,7 +23,7 @@ class ReceiveChatMsg {
                     break;
                 }
                 case "REGISTER": {
-                    //dealRegister(msg);
+                    dealRegister(msg);
                     break;
                 }
                 case "DRESSUP": {
@@ -82,6 +86,17 @@ class ReceiveChatMsg {
                     dealError();
                     break;
             }
+        }
+    }
+
+    private void dealRegister(String msg) {
+        String p = "\\[REGISTER\\]:\\[(.*)\\]";
+        Pattern pattern = Pattern.compile(p);
+        Matcher matcher = pattern.matcher(msg);
+        Log.i("info", "dealRegister"+p);
+        if (matcher.find()) {
+            Log.i("info", "dealRegister");
+            EventBus.getDefault().post(new EventBean.RegisterEvent(matcher.group(1).equals("1")));
         }
     }
 

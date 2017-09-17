@@ -23,6 +23,14 @@ public class ParaseData {
         serverManager.sendMessage(msg);
     }
 
+    public static void requestRegister(String account,String password,String username){
+        if (account == null || password==null || username==null || account.equals("") || password.equals("") || username.equals("")) {
+            return;
+        }
+        String msg = "[REGISTER]:[" + account + ", " + password + ", " + username +"]";
+        serverManager.sendMessage(msg);
+    }
+
     public static String[] getDressUp(Context context, String username) {
         String[] strings = {"", ""};
         String msg = "[GETDRESSUP]:[" + username +"]";

@@ -1,5 +1,6 @@
 package com.example.qgchat.loginAndregister;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -58,8 +59,7 @@ public class AtyRegister extends BaseActivity {
                 }
             }
         });
-        //replaceFragment(new RegisterFragment1());
-        replaceFragment(new RegisterFragment4());
+        replaceFragment(new RegisterFragment1());
         getFragmentManager().executePendingTransactions();
     }
 
@@ -96,6 +96,12 @@ public class AtyRegister extends BaseActivity {
         this.password = password.getPassword();
         RegisterFragment4 fragment4 = new RegisterFragment4();
         replaceFragment(fragment4);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(RegisterFragment4.Icon icon) {
+        Intent intent = new Intent(AtyRegister.this, AtyLogin.class);
+        startActivity(intent);
     }
 
     @Override

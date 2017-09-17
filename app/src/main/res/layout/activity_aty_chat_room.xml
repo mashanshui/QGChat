@@ -110,13 +110,13 @@
             android:id="@+id/btnSend"
             android:layout_width="60dp"
             android:layout_height="35dp"
-            android:layout_marginStart="@dimen/dp_10"
             android:layout_marginEnd="@dimen/dp_10"
-            android:text="Send"
+            android:layout_marginStart="@dimen/dp_10"
             android:clickable="false"
             android:textAllCaps="false"
             app:normalBackgroundColor="@color/sendButtonColor"
             app:pressedBackgroundColor="#666666"
-            app:radius="6dp"/>
+            app:radius="6dp"
+            tools:text="发送" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -57,6 +57,7 @@ public class AtyLogin extends BaseActivity {
         switch (view.getId()) {
             case R.id.btn_login:
                 if (AccessNetwork.getNetworkState(this) != AccessNetwork.INTERNET_NONE) {
+                    showBufferDialog();
                     login();
                 } else {
                     setToast("找不到可用网络");
@@ -93,6 +94,7 @@ public class AtyLogin extends BaseActivity {
              * 将是否登录设置为true
              * 将帐号密码保存在本地
              */
+            dismissBufferDialog();
             SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean("login", true);

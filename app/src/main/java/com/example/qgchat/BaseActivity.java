@@ -143,11 +143,11 @@ public class BaseActivity extends AppCompatActivity {
             //如果socket没有连接，使用Thread的run方法再次启动
             if (serverManager.socket==null) {
                 serverManager.run();
-                SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
-                account = preferences.getString("account", "");
-                password = preferences.getString("password", "");
-                ParaseData.requestLogin(account, password);
             }
+            SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
+            account = preferences.getString("account", "");
+            password = preferences.getString("password", "");
+            ParaseData.requestLogin(account, password);
         }
     }
 
