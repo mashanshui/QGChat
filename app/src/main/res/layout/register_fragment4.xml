@@ -6,7 +6,7 @@
     android:background="#FAFAFA"
     tools:context="com.example.qgchat.loginAndregister.fragment.RegisterFragment1">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/icon_preview"
         android:layout_width="300dp"
         android:layout_height="300dp"

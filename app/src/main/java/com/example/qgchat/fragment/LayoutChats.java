@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +15,17 @@ import android.view.ViewGroup;
 import com.ajguan.library.EasyRefreshLayout;
 import com.ajguan.library.LoadModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
-import com.chad.library.adapter.base.listener.OnItemDragListener;
-import com.example.qgchat.AtyChatRoom;
+import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
 import com.example.qgchat.bean.UserItemMsg;
+import com.example.qgchat.broadcast.NetworkChangeReceiver;
+import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.GridItemDecoration;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +48,7 @@ public class LayoutChats extends Fragment {
     @BindView(R.id.chatsRecycleView)
     RecyclerView chatsRecycleView;
     Unbinder unbinder;
-
+    private View headview;
     private Intent intent;
 
     public LayoutChats() {
@@ -56,6 +60,7 @@ public class LayoutChats extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_layout_chats, container, false);
+        headview = inflater.inflate(R.layout.recycleview_head_view, container, false);
         unbinder = ButterKnife.bind(this, rootView);
         initAdapter();
         initRefresh();
@@ -84,13 +89,7 @@ public class LayoutChats extends Fragment {
     }
 
     private void initAdapter() {
-        for (int i = 0; i < 12; i++) {
-            UserItemMsg userItemMsg = new UserItemMsg();
-            //userItemMsg.setIconURL();
-            userItemMsg.setUsername("Tony Stark");
-            userItemMsg.setSign("You know who I am !");
-            userItemMsgList.add(userItemMsg);
-        }
+        loadData();
         adapter = new ChatRecyclerAdapter(userItemMsgList);
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -113,6 +112,39 @@ public class LayoutChats extends Fragment {
         chatsRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    private void loadData() {
+        for (int i = 0; i < 12; i++) {
+            UserItemMsg userItemMsg = new UserItemMsg();
+            //userItemMsg.setIconURL();
+            userItemMsg.setUsername("Tony Stark");
+            userItemMsg.setSign("You know who I am !");
+            userItemMsgList.add(userItemMsg);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(NetworkChangeReceiver.NetWorkChange change) {
+//        headview=layoutInflater.inflate(R.layout.recycleview_head_view, (ViewGroup) chatsRecycleView.getParent(), false);
+        if (change.getNetworkState() == AccessNetwork.INTERNET_NONE) {
+            adapter.addHeaderView(headview);
+            chatsRecycleView.scrollToPosition(0);   //没有动画的滑动
+           // chatsRecycleView.smoothScrollToPosition(0);   //有动画的滑动
+        } else {
+            adapter.removeHeaderView(headview);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 
     @Override
     public void onDestroyView() {

@@ -9,12 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.qgchat.AtyMain;
-import com.example.qgchat.BaseActivity;
+import com.example.qgchat.activity.AtyMain;
+import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.R;
-import com.example.qgchat.server.LoginEvent;
-import com.example.qgchat.server.ParaseData;
-import com.example.qgchat.server.ServerManager;
+import com.example.qgchat.socket.LoginEvent;
+import com.example.qgchat.socket.ParaseData;
+import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
@@ -103,6 +103,8 @@ public class AtyLogin extends BaseActivity {
             editor.apply();
             serverManager.setAccount(account);
             Intent intent = new Intent(AtyLogin.this, AtyMain.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         } else {
             setToast("帐号或密码错误");

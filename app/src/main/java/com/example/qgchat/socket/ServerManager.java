@@ -1,10 +1,8 @@
-package com.example.qgchat.server;
+package com.example.qgchat.socket;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,7 +53,7 @@ public class ServerManager extends Thread {
                 if (!line.equals("-1")) {
                     m += line;
                 } else {
-                    Log.i("TAG", "receive : " + m);
+//                    Log.i("TAG", "receive : " + m);
                     receiveChatMsg.delMessage(m);
                     message = m;
                     m = null;
@@ -74,6 +72,7 @@ public class ServerManager extends Thread {
                 if (socket != null) {
                     socket.close();
                 }
+//                Log.i("info", "连接断开------");
                 setAccount(null);
             } catch (IOException e) {
                 e.printStackTrace();

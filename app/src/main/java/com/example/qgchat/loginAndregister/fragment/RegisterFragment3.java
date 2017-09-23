@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import com.example.qgchat.R;
 import com.example.qgchat.loginAndregister.AtyRegister;
-import com.example.qgchat.loginAndregister.EventBean;
-import com.example.qgchat.server.ParaseData;
+import com.example.qgchat.util.EventBean;
+import com.example.qgchat.socket.ParaseData;
 import com.example.qgchat.util.StateButton;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -84,7 +84,7 @@ public class RegisterFragment3 extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(EventBean.RegisterEvent registerEvent) {
-        Log.i("info", "register3接收");
+        //Log.i("info", "register3接收");
         ((AtyRegister) getActivity()).dismissBufferDialog();
         if (registerEvent.isRegister()) {
             EventBus.getDefault().post(new Password(password1));

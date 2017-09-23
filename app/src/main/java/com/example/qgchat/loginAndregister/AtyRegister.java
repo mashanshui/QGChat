@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.example.qgchat.BaseActivity;
+import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.R;
 import com.example.qgchat.loginAndregister.fragment.RegisterFragment1;
 import com.example.qgchat.loginAndregister.fragment.RegisterFragment2;
@@ -76,9 +76,6 @@ public class AtyRegister extends BaseActivity {
         if (number.isNumberComplete()) {
             RegisterFragment2 fragment2 = new RegisterFragment2();
             phoneNumber=number.getNumber();
-//            Bundle bundle = new Bundle();
-//            bundle.putString("number",number.getNumber());
-//            fragment2.setArguments(bundle);
             replaceFragment(fragment2);
         }
     }
@@ -101,6 +98,8 @@ public class AtyRegister extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(RegisterFragment4.Icon icon) {
         Intent intent = new Intent(AtyRegister.this, AtyLogin.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

@@ -1,4 +1,4 @@
-package com.example.qgchat;
+package com.example.qgchat.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.qgchat.R;
 import com.example.qgchat.adapter.GuideAdapter;
 import com.example.qgchat.loginAndregister.AtyLogin;
 import com.example.qgchat.util.UltimateBar;

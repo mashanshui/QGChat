@@ -1,4 +1,4 @@
-package com.example.qgchat.server;
+package com.example.qgchat.socket;
 
 
 import java.util.ArrayList;

@@ -1,7 +1,6 @@
-package com.example.qgchat.server;
+package com.example.qgchat.socket;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;

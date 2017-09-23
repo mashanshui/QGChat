@@ -1,9 +1,9 @@
-package com.example.qgchat.server;
+package com.example.qgchat.socket;
 
 
 import android.util.Log;
 
-import com.example.qgchat.loginAndregister.EventBean;
+import com.example.qgchat.util.EventBean;
 
 import org.greenrobot.eventbus.EventBus;
 

@@ -1,12 +1,9 @@
-package com.example.qgchat;
+package com.example.qgchat.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,11 +14,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.example.qgchat.broadcast.NetworkChangeReceiver;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.loginAndregister.AtyLogin;
-import com.example.qgchat.server.LoginEvent;
-import com.example.qgchat.server.ParaseData;
-import com.example.qgchat.server.ServerManager;
+import com.example.qgchat.socket.LoginEvent;
+import com.example.qgchat.socket.ParaseData;
+import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.ActivityCollector;
 import com.example.qgchat.util.HttpUtil;
@@ -38,22 +36,23 @@ import java.util.List;
  */
 
 public class BaseActivity extends AppCompatActivity {
+    private static final String TAG = "info";
     public ServerManager serverManager = ServerManager.getServerManager();
     private static PermissionListener permissionListener;
     private ProgressDialog dialog;
     public String account = null;
     public String password = null;
-    private IntentFilter intentFilter;
-    private NetworkChangeReceiver networkChangeReceiver;
+//    public IntentFilter intentFilter;
+//    public NetworkChangeReceiver networkChangeReceiver;
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        intentFilter = new IntentFilter();
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        networkChangeReceiver = new NetworkChangeReceiver();
-        registerReceiver(networkChangeReceiver, intentFilter);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        intentFilter = new IntentFilter();
+//        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+//        networkChangeReceiver = new NetworkChangeReceiver();
+//        registerReceiver(networkChangeReceiver, intentFilter);
+//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,11 +60,11 @@ public class BaseActivity extends AppCompatActivity {
         ActivityCollector.addActivity(this);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(networkChangeReceiver);
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        unregisterReceiver(networkChangeReceiver);
+//    }
 
     @Override
     protected void onDestroy() {
@@ -88,7 +87,7 @@ public class BaseActivity extends AppCompatActivity {
         if (!permissionList.isEmpty()) {
             ActivityCompat.requestPermissions(topActivity, permissionList.toArray(new String[permissionList.size()]), 1);
         } else {
-            listener.onGranted();
+            permissionListener.onGranted();
         }
     }
 
@@ -135,14 +134,19 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void autoLogin() {
-        if (serverManager.getAccount() == null || serverManager.getAccount().equals("")) {
+        if (serverManager.getAccount() == null) {
             //如果线程没有start过，进行start
             if (serverManager.getState()== Thread.State.NEW) {
                 serverManager.start();
             }
             //如果socket没有连接，使用Thread的run方法再次启动
-            if (serverManager.socket==null) {
-                serverManager.run();
+            if (serverManager.socket.isClosed()) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        serverManager.run();
+                    }
+                }).start();
             }
             SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
             account = preferences.getString("account", "");
@@ -187,13 +191,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    class NetworkChangeReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (AccessNetwork.getNetworkState(context) != AccessNetwork.INTERNET_NONE) {
-                setToast(String.valueOf(AccessNetwork.getNetworkState(context)));
-                autoLogin();
-            }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(NetworkChangeReceiver.NetWorkChange change) {
+        if (change.getNetworkState() != AccessNetwork.INTERNET_NONE) {
+            autoLogin();
         }
     }
 

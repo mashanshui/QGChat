@@ -1,4 +1,4 @@
-package com.example.qgchat.server;
+package com.example.qgchat.socket;
 
 /**
  * Created by Administrator on 2017/9/9.

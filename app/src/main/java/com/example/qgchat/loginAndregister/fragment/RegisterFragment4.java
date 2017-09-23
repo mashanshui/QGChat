@@ -7,14 +7,15 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.qgchat.BaseActivity;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.R;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.loginAndregister.AtyRegister;
@@ -39,7 +40,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -52,11 +52,12 @@ import static android.app.Activity.RESULT_OK;
 public class RegisterFragment4 extends Fragment {
     private static final String TAG = "RegisterFragment4";
     private static final int REQUEST_CODE_CHOOSE = 23;
-    @BindView(R.id.icon_preview)
-    CircleImageView iconPreview;
+
     Unbinder unbinder;
     @BindView(R.id.btn_register)
     StateButton btnRegister;
+    @BindView(R.id.icon_preview)
+    ImageView iconPreview;
     private Uri imageUri;
 
     public RegisterFragment4() {
@@ -82,6 +83,7 @@ public class RegisterFragment4 extends Fragment {
                     public void onGranted() {
                         Matisse.from(RegisterFragment4.this)
                                 .choose(MimeType.ofAll(), false)
+                                .maxSelectable(1)
                                 .countable(true)
                                 .capture(true)
                                 .captureStrategy(
@@ -98,7 +100,6 @@ public class RegisterFragment4 extends Fragment {
 
                     @Override
                     public void onDenied(List<String> deniedPermission) {
-
                     }
                 });
                 break;
@@ -120,14 +121,21 @@ public class RegisterFragment4 extends Fragment {
     }
 
     private void beginCrop(Uri source) {
-        Uri destination = Uri.fromFile(new File(getActivity().getExternalFilesDir(null), "icon.jpg"));
-        Crop.of(source, destination).asSquare().start(getContext(), RegisterFragment4.this);
+        File file = new File(getActivity().getExternalFilesDir(null), "icon.jpg");
+        if (file.exists()) {
+            file.delete();
+        }
+        Uri destination = Uri.fromFile(file);
+        Crop.of(source, destination).asSquare().withMaxSize(300, 300).start(getContext(), RegisterFragment4.this);
     }
 
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
             imageUri = Crop.getOutput(result);
-            Glide.with(getContext()).load(imageUri).into(iconPreview);
+            /**
+             * 使用gilde加载图片时要设置禁止内存缓存和禁止磁盘缓存，否则再次选择图片时会加载原来缓存的图片
+             */
+            Glide.with(getContext()).load(imageUri).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(iconPreview);
         } else if (resultCode == Crop.RESULT_ERROR) {
             Toast.makeText(getActivity(), Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -137,10 +145,10 @@ public class RegisterFragment4 extends Fragment {
         String filePath = imageUri.getEncodedPath();
         String imagePath = Uri.decode(filePath);
         Map<String, String> param = new HashMap<>();
-        String filename=((AtyRegister) getActivity()).phoneNumber;
+        String filename = ((AtyRegister) getActivity()).phoneNumber;
         param.put("account", filename);
         ((AtyRegister) getActivity()).showBufferDialog();
-        HttpUtil.uploadImage("http://www.chemaxianxing.com/QGChatHttp/UploadIcon", param, imagePath,filename, new Callback() {
+        HttpUtil.uploadImage("http://www.chemaxianxing.com/QGChatHttp/UploadIcon", param, imagePath, filename, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {

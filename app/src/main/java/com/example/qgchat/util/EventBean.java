@@ -1,10 +1,10 @@
-package com.example.qgchat.loginAndregister;
+package com.example.qgchat.util;
 
 /**
  * Created by Administrator on 2017/9/15.
  */
 
-public  class EventBean {
+public class EventBean {
     public static class RegisterEvent{
         private boolean isRegister;
 

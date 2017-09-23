@@ -1,11 +1,8 @@
-package com.example.qgchat;
+package com.example.qgchat.activity;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.qgchat.R;
 import com.example.qgchat.adapter.AdapterChatRoom;
 import com.example.qgchat.bean.ChatMsg;
 import com.example.qgchat.bean.UserItemMsg;
