@@ -26,8 +26,8 @@ class ReceiveChatMsg {
                     dealRegister(msg);
                     break;
                 }
-                case "DRESSUP": {
-                    //dealDressUp(msg);
+                case "ACKCHATMSG": {
+                    dealAckChatMsg(msg);
                     break;
                 }
                 case "GETDRESSUP": {
@@ -58,7 +58,7 @@ class ReceiveChatMsg {
                     //dealState(msg);
                     break;
                 }
-                case "CHATMSG": {
+                case "RECEIVECHATMSG": {
                     dealChatMsg(msg);
                     break;
                 }
@@ -82,6 +82,14 @@ class ReceiveChatMsg {
                     //dealGetAllGroupList(msg);
                     break;
                 }
+                case "ACK_SEARCH_FRIEND":{
+                    dealSearchFriend(msg);
+                    break;
+                }
+                case "ACK_SEARCH_FRIEND_TRUE":{
+                    dealSearchFriendTrue(msg);
+                    break;
+                }
                 default:
                     dealError();
                     break;
@@ -89,28 +97,33 @@ class ReceiveChatMsg {
         }
     }
 
+    private void dealSearchFriendTrue(String msg) {
+        String p = "\\[ACK_SEARCH_FRIEND_TRUE\\]:\\[(.*)\\]";
+        Pattern pattern = Pattern.compile(p);
+        Matcher matcher = pattern.matcher(msg);
+        if (matcher.find()) {
+            EventBus.getDefault().post(new EventBean.SerachFriendEventTrue(matcher.group(1).equals("1")));
+        }
+    }
+
+    private void dealSearchFriend(String msg) {
+        String p = "\\[ACK_SEARCH_FRIEND\\]:\\[(.*)\\]";
+        Pattern pattern = Pattern.compile(p);
+        Matcher matcher = pattern.matcher(msg);
+        if (matcher.find()) {
+            EventBus.getDefault().post(new EventBean.SerachFriendEvent(matcher.group(1).equals("1")));
+        }
+    }
+
+    private void dealAckChatMsg(String msg) {
+    }
+
     private void dealRegister(String msg) {
         String p = "\\[REGISTER\\]:\\[(.*)\\]";
         Pattern pattern = Pattern.compile(p);
         Matcher matcher = pattern.matcher(msg);
-        Log.i("info", "dealRegister"+p);
         if (matcher.find()) {
-            Log.i("info", "dealRegister");
             EventBus.getDefault().post(new EventBean.RegisterEvent(matcher.group(1).equals("1")));
-        }
-    }
-
-    private void dealError() {
-    }
-
-    public String getAction(String msg) {
-        String p = "\\[(.*)\\]:";
-        Pattern pattern = Pattern.compile(p);
-        Matcher matcher = pattern.matcher(msg);
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            return "error";
         }
     }
 
@@ -125,23 +138,37 @@ class ReceiveChatMsg {
     }
 
     public void dealChatMsg(String msg) {
-
-        String sendName = null;
+        String chatObj = null;
+        String username = null;
+        String iconURL = null;
+        String MsgType = null;
         String content = null;
-        String avatarID = null;
-        String fileType = null;
-        String group = null;
 
-        ServerManager.getServerManager().setMessage(null);
-        String p = "\\[GETCHATMSG\\]:\\[(.*), (.*), (.*), (.*), (.*)\\]";
+        String p = "\\[RECEIVECHATMSG\\]:\\[(.*), (.*), (.*), (.*), (.*)\\]";
         Pattern pattern = Pattern.compile(p);
         Matcher matcher = pattern.matcher(msg);
         if (matcher.find()) {
-            sendName = matcher.group(1);
-            content = matcher.group(2);
-            avatarID = matcher.group(3);
-            fileType = matcher.group(4);
-            group = matcher.group(5);
+            chatObj = matcher.group(1);
+            username = matcher.group(2);
+            iconURL = matcher.group(3);
+            MsgType = matcher.group(4);
+            content = matcher.group(5);
+        }
+        Log.i("info", "dealChatMsg: "+chatObj+username+iconURL+MsgType+content);
+    }
+
+
+    private void dealError() {
+    }
+
+    public String getAction(String msg) {
+        String p = "\\[(.*)\\]:";
+        Pattern pattern = Pattern.compile(p);
+        Matcher matcher = pattern.matcher(msg);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return "error";
         }
     }
 }

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import com.ajguan.library.EasyRefreshLayout;
 import com.ajguan.library.LoadModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
 import com.example.qgchat.bean.UserItemMsg;
@@ -81,7 +79,7 @@ public class LayoutChats extends Fragment {
                     @Override
                     public void run() {
 //                        adapter.setNewData(data);
-//                        refreshRecycleView.refreshComplete();
+                        refreshRecycleView.refreshComplete();
                     }
                 }, 1000);
             }
@@ -95,8 +93,6 @@ public class LayoutChats extends Fragment {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 UserItemMsg userItemMsg=userItemMsgList.get(position);
-                intent = new Intent(getActivity(), AtyChatRoom.class);
-                intent.putExtra("userItemMsg", userItemMsg);
                 startActivityForResult(intent,1);
             }
         });

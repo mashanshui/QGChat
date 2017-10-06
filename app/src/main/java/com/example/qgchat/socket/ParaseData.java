@@ -3,10 +3,15 @@ package com.example.qgchat.socket;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.qgchat.bean.SendMsg;
+import com.example.qgchat.util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.R.attr.password;
 
 public class ParaseData {
 
@@ -15,7 +20,7 @@ public class ParaseData {
 
 
     public static void requestLogin(String account,String password){
-        if (account == null || password==null || account.equals("") || password.equals("")) {
+        if (StringUtil.isEmpty(account,password)) {
             return;
         }
         String msg = "[LOGIN]:[" + account + ", " + password + "]";
@@ -23,10 +28,34 @@ public class ParaseData {
     }
 
     public static void requestRegister(String account,String password,String username){
-        if (account == null || password==null || username==null || account.equals("") || password.equals("") || username.equals("")) {
+        if (StringUtil.isEmpty(account,password,username)) {
             return;
         }
         String msg = "[REGISTER]:[" + account + ", " + password + ", " + username +"]";
+        serverManager.sendMessage(msg);
+    }
+
+    public static void sendSearchFriend(String account) {
+        if (StringUtil.isEmpty(account)) {
+            return;
+        }
+        String msg = "[SEARCH_FRIEND]:[" + account + "]";
+        serverManager.sendMessage(msg);
+    }
+
+    public static void sendSearchFriendTrue(String account) {
+        if (StringUtil.isEmpty(account)) {
+            return;
+        }
+        String msg = "[SEARCH_FRIEND_TRUE]:[" + account + "]";
+        serverManager.sendMessage(msg);
+    }
+
+    public static void sendChatMsg(SendMsg sendMsg) {
+        if (StringUtil.isEmpty(sendMsg.getChatObj(), sendMsg.getContent())) {
+            return;
+        }
+        String msg= "[SENDCHATMSG]:[" + sendMsg.getChatObj() + ", " + sendMsg.getMsgType() + ", " + sendMsg.getContent() +"]";
         serverManager.sendMessage(msg);
     }
 

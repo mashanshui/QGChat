@@ -7,13 +7,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.permissionlib.*;
+import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.db.DBUserList;
 import com.example.qgchat.listener.*;
 import com.example.qgchat.listener.PermissionListener;
+import com.example.qgchat.socket.LoginEvent;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.LogUtil;
 
@@ -26,7 +29,7 @@ import java.util.List;
 import static android.R.attr.permission;
 
 public class TestActivity extends AppCompatActivity {
-
+    private static final String TAG = "TestActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +57,7 @@ public class TestActivity extends AppCompatActivity {
 //        }
 
 
-//        DBUserItemMsg dbUserItemMsg = new DBUserItemMsg();
+//        UserItemMsg dbUserItemMsg = new UserItemMsg();
 //        dbUserItemMsg.setIconURL("sadf");
 //        dbUserItemMsg.setSign("sdfsd");
 //        dbUserItemMsg.setUsername("sefdsd");
@@ -64,5 +67,13 @@ public class TestActivity extends AppCompatActivity {
 //        AccessNetwork network = new AccessNetwork(this);
 //        LogUtil.i("info",String.valueOf(network.getNetworkStateName()));
 
+        DBChatMsg msg = new DBChatMsg();
+        msg.setIconURL("asd");
+        msg.setUsername("asdfas");
+        msg.setChatObj("asd");
+        msg.setContent("asd");
+        msg.setMsgType(DBChatMsg.TYPE_RECEIVED);
+        msg.save();
+        Log.i(TAG, "onCreate: "+String.valueOf(msg.getId()));
     }
 }

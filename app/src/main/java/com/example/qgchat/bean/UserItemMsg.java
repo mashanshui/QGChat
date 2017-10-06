@@ -3,35 +3,26 @@ package com.example.qgchat.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import static android.R.attr.id;
+
 /**
  * Created by Administrator on 2017/8/7.
  */
 
-public class UserItemMsg implements Parcelable {
+public class UserItemMsg {
+
+    private String chatObj;
     private String iconURL;
     private String username;
     private String sign;
 
-    public UserItemMsg() {
+    public String getChatObj() {
+        return chatObj;
     }
 
-    protected UserItemMsg(Parcel in) {
-        iconURL = in.readString();
-        username = in.readString();
-        sign = in.readString();
+    public void setChatObj(String chatObj) {
+        this.chatObj = chatObj;
     }
-
-    public static final Creator<UserItemMsg> CREATOR = new Creator<UserItemMsg>() {
-        @Override
-        public UserItemMsg createFromParcel(Parcel in) {
-            return new UserItemMsg(in);
-        }
-
-        @Override
-        public UserItemMsg[] newArray(int size) {
-            return new UserItemMsg[size];
-        }
-    };
 
     public String getIconURL() {
         return iconURL;
@@ -55,17 +46,5 @@ public class UserItemMsg implements Parcelable {
 
     public void setSign(String sign) {
         this.sign = sign;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(iconURL);
-        dest.writeString(username);
-        dest.writeString(sign);
     }
 }

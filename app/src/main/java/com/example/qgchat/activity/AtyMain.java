@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
+import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
@@ -174,9 +175,11 @@ public class AtyMain extends BaseActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        if (id == R.id.action_add_friend) {
+            Intent intent = new Intent(AtyMain.this, AtyAddFriend.class);
+            startActivity(intent);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

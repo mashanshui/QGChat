@@ -42,29 +42,13 @@ public class BaseActivity extends AppCompatActivity {
     private ProgressDialog dialog;
     public String account = null;
     public String password = null;
-//    public IntentFilter intentFilter;
-//    public NetworkChangeReceiver networkChangeReceiver;
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        intentFilter = new IntentFilter();
-//        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-//        networkChangeReceiver = new NetworkChangeReceiver();
-//        registerReceiver(networkChangeReceiver, intentFilter);
-//    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityCollector.addActivity(this);
     }
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        unregisterReceiver(networkChangeReceiver);
-//    }
 
     @Override
     protected void onDestroy() {

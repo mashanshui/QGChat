@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.example.qgchat.R;
-import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.bean.UserMoments;
 
 import java.util.List;

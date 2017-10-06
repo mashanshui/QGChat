@@ -15,8 +15,8 @@ import android.widget.TextView;
 
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.AdapterChatRoom;
-import com.example.qgchat.bean.ChatMsg;
 import com.example.qgchat.bean.UserItemMsg;
+import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
 
@@ -40,7 +40,7 @@ public class AtyChatRoom extends BaseActivity {
     StateButton btnSend;
 
     private AdapterChatRoom adapter;
-    private List<ChatMsg> chatMsgList = new ArrayList<>();
+    private List<DBChatMsg> chatMsgList = new ArrayList<>();
     private UserItemMsg msg;
 
     @Override
@@ -102,9 +102,9 @@ public class AtyChatRoom extends BaseActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatMsg msg = new ChatMsg();
+                DBChatMsg msg = new DBChatMsg();
                 msg.setContent(myMsg.getText().toString());
-                msg.setMsgType(ChatMsg.TYPE_SENT);
+                msg.setMsgType(DBChatMsg.TYPE_SENT);
                 chatMsgList.add(msg);
                 myMsg.setText("");
                 adapter.notifyItemInserted(chatMsgList.size()-1);
@@ -115,9 +115,9 @@ public class AtyChatRoom extends BaseActivity {
 
     private void initAdapter() {
 
-        ChatMsg msg = new ChatMsg();
+        DBChatMsg msg = new DBChatMsg();
         msg.setContent("hellow world!");
-        msg.setMsgType(ChatMsg.TYPE_SENT);
+        msg.setMsgType(DBChatMsg.TYPE_SENT);
         chatMsgList.add(msg);
 
         adapter = new AdapterChatRoom(chatMsgList);

@@ -84,7 +84,6 @@ public class RegisterFragment3 extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(EventBean.RegisterEvent registerEvent) {
-        //Log.i("info", "register3接收");
         ((AtyRegister) getActivity()).dismissBufferDialog();
         if (registerEvent.isRegister()) {
             EventBus.getDefault().post(new Password(password1));

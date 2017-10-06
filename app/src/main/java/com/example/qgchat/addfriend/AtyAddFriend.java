@@ -1,23 +1,27 @@
-package com.example.qgchat.loginAndregister;
+package com.example.qgchat.addfriend;
 
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
-import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.R;
+import com.example.qgchat.activity.BaseActivity;
+import com.example.qgchat.addfriend.fragment.SearchFragment;
 import com.example.qgchat.loginAndregister.fragment.RegisterFragment1;
 import com.example.qgchat.loginAndregister.fragment.RegisterFragment2;
-import com.example.qgchat.loginAndregister.fragment.RegisterFragment3;
-import com.example.qgchat.loginAndregister.fragment.RegisterFragment4;
+import com.example.qgchat.socket.ParaseData;
+import com.example.qgchat.util.EventBean;
+import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -26,20 +30,18 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+public class AtyAddFriend extends BaseActivity {
 
-public class AtyRegister extends BaseActivity {
-    private static final String TAG = "AtyRegister";
     @BindView(R.id.toolBar)
     Toolbar toolBar;
     @BindView(R.id.fragment_layout)
     FrameLayout fragmentLayout;
-    public String phoneNumber = null;
-    public String password = null;
+    public String searchAccount = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aty_register);
+        setContentView(R.layout.activity_aty_add_friend);
         ButterKnife.bind(this);
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBar(ContextCompat.getColor(this, R.color.colorPrimary));
@@ -53,12 +55,12 @@ public class AtyRegister extends BaseActivity {
                 getSupportFragmentManager().executePendingTransactions();
                 if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
                     getSupportFragmentManager().popBackStack();
-                } else if (getSupportFragmentManager().getBackStackEntryCount() ==1) {
+                } else if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
                     finish();
                 }
             }
         });
-        replaceFragment(new RegisterFragment1());
+        replaceFragment(new SearchFragment());
         getFragmentManager().executePendingTransactions();
     }
 
@@ -71,35 +73,44 @@ public class AtyRegister extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(RegisterFragment1.Number number) {
-        if (number.isNumberComplete()) {
-            RegisterFragment2 fragment2 = new RegisterFragment2();
-            phoneNumber=number.getNumber();
-            replaceFragment(fragment2);
+    public void onMessage(SearchFragment.Search search) {
+        if (search.isSearch()) {
+            searchAccount = search.getAccount();
+            showDialog();
         }
     }
 
+    private void showDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AtyAddFriend.this);
+        dialogBuilder.setTitle("添加好友");
+        dialogBuilder.setMessage("确认添加");
+        dialogBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showBufferDialog();
+                ParaseData.sendSearchFriendTrue(searchAccount);
+            }
+        });
+        dialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        dialogBuilder.setCancelable(true);
+        AlertDialog dialog=dialogBuilder.create();
+        dialog.show();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(RegisterFragment2.Code code) {
-        if (code.isCode()) {
-            RegisterFragment3 fragment3 = new RegisterFragment3();
-            replaceFragment(fragment3);
+    public void onMessage(EventBean.SerachFriendEventTrue search) {
+        dismissBufferDialog();
+        if (search.isAdd()) {
+            setToast("添加成功");
+            finish();
+        } else {
+            setToast("添加失败");
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(RegisterFragment3.Password password) {
-        this.password = password.getPassword();
-        RegisterFragment4 fragment4 = new RegisterFragment4();
-        replaceFragment(fragment4);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(RegisterFragment4.Icon icon) {
-        Intent intent = new Intent(AtyRegister.this, AtyLogin.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
     }
 
     @Override
@@ -107,7 +118,7 @@ public class AtyRegister extends BaseActivity {
         int count = getSupportFragmentManager().getBackStackEntryCount();
         if (count > 1) {
             getSupportFragmentManager().popBackStack();
-        } else if (count ==1) {
+        } else if (count == 1) {
             finish();
         }
     }

@@ -2,7 +2,6 @@ package com.example.qgchat.fragment;
 
 
 import android.os.Bundle;
-import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,21 +11,16 @@ import android.view.ViewGroup;
 
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.MomentsRecycleAdapter;
-import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.bean.UserMoments;
-import com.example.qgchat.util.GridItemDecoration;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static com.example.qgchat.R.id.chatsRecycleView;
 
 /**
  * A simple {@link Fragment} subclass.

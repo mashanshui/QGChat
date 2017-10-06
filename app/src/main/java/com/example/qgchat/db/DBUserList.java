@@ -13,21 +13,19 @@ public class DBUserList extends DataSupport {
     private int id;
     private String iconURL;
     private String username;
+    private String account;
     //建立一对多的连接
     private DBUserGruop dbUserGruop;
 
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
     private List<DBUserMoments> dbUserMomentsList = new ArrayList<DBUserMoments>();
-
-    private List<DBUserItemMsg> dbUserItemMsgList = new ArrayList<DBUserItemMsg>();
-
-
-    public List<DBUserItemMsg> getDbUserItemMsgList() {
-        return dbUserItemMsgList;
-    }
-
-    public void setDbUserItemMsgList(List<DBUserItemMsg> dbUserItemMsgList) {
-        this.dbUserItemMsgList = dbUserItemMsgList;
-    }
 
     public List<DBUserMoments> getDbUserMomentsList() {
         return dbUserMomentsList;

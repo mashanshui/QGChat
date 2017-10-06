@@ -33,9 +33,10 @@ public class AtyWelcome extends BaseActivity {
         ultimateBar.setImmersionBar();
         ImageView welcome_image = (ImageView) findViewById(R.id.welcome_image);
         Glide.with(this).load(R.drawable.shot).into(welcome_image);
-        if (AccessNetwork.getNetworkState(this) != AccessNetwork.INTERNET_NONE && serverManager.socket==null) {
-            serverManager.start();
-        }
+//        if (AccessNetwork.getNetworkState(this) != AccessNetwork.INTERNET_NONE && serverManager.socket==null) {
+//            serverManager.start();
+//        }
+        serverManager.start();
         preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
         initLoad();
     }
