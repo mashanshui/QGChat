@@ -5,22 +5,25 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.qgchat.R;
 import com.example.qgchat.loginAndregister.AtyLogin;
+import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.UltimateBar;
 
 import butterknife.ButterKnife;
 
-public class AtyWelcome extends BaseActivity {
+public class AtyWelcome extends AppCompatActivity {
     private static final String TAG = "AtyWelcome";
     private static final int DELAY = 1000;
     private static final int GO_GUIDE = 0;
     private static final int GO_HOME = 1;
     private static final int GO_LOGIN = 2;
+    private ServerManager serverManager = ServerManager.getServerManager();
     private SharedPreferences preferences;
 
     @Override

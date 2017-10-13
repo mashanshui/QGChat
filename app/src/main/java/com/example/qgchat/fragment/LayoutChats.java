@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +16,18 @@ import com.ajguan.library.EasyRefreshLayout;
 import com.ajguan.library.LoadModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.qgchat.R;
+import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
 import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.broadcast.NetworkChangeReceiver;
+import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.GridItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +46,11 @@ public class LayoutChats extends Fragment {
     @BindView(R.id.refresh_recycleView)
     EasyRefreshLayout refreshRecycleView;
     private List<UserItemMsg> userItemMsgList = new ArrayList<>();
-    private ChatRecyclerAdapter adapter;
+    private ChatRecyclerAdapter adapter = new ChatRecyclerAdapter(userItemMsgList);
     @BindView(R.id.chatsRecycleView)
     RecyclerView chatsRecycleView;
     Unbinder unbinder;
     private View headview;
-    private Intent intent;
 
     public LayoutChats() {
         // Required empty public constructor
@@ -65,6 +68,14 @@ public class LayoutChats extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
     private void initRefresh() {
         refreshRecycleView.setLoadMoreModel(LoadModel.NONE);
         refreshRecycleView.addEasyEvent(new EasyRefreshLayout.EasyEvent() {
@@ -78,7 +89,8 @@ public class LayoutChats extends Fragment {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-//                        adapter.setNewData(data);
+                        loadData();
+                        adapter.notifyDataSetChanged();
                         refreshRecycleView.refreshComplete();
                     }
                 }, 1000);
@@ -88,11 +100,12 @@ public class LayoutChats extends Fragment {
 
     private void initAdapter() {
         loadData();
-        adapter = new ChatRecyclerAdapter(userItemMsgList);
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 UserItemMsg userItemMsg=userItemMsgList.get(position);
+                Intent intent = new Intent(getActivity(), AtyChatRoom.class);
+                intent.putExtra("friend_account", userItemMsg.getChatObj());
                 startActivityForResult(intent,1);
             }
         });
@@ -109,11 +122,18 @@ public class LayoutChats extends Fragment {
     }
 
     private void loadData() {
-        for (int i = 0; i < 12; i++) {
+        userItemMsgList.clear();
+        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class);
+        if (dbUserItemMsgs.isEmpty()) {
+            return;
+        }
+        for (int i = dbUserItemMsgs.size() - 1; i >= 0; i--) {
+            DBUserItemMsg dbUserItemMsg = dbUserItemMsgs.get(i);
             UserItemMsg userItemMsg = new UserItemMsg();
-            //userItemMsg.setIconURL();
-            userItemMsg.setUsername("Tony Stark");
-            userItemMsg.setSign("You know who I am !");
+            userItemMsg.setIconURL(dbUserItemMsg.getIconURL());
+            userItemMsg.setUsername(dbUserItemMsg.getUsername());
+            userItemMsg.setSign(dbUserItemMsg.getSign());
+            userItemMsg.setChatObj(dbUserItemMsg.getChatObj());
             userItemMsgList.add(userItemMsg);
         }
     }
@@ -123,8 +143,8 @@ public class LayoutChats extends Fragment {
 //        headview=layoutInflater.inflate(R.layout.recycleview_head_view, (ViewGroup) chatsRecycleView.getParent(), false);
         if (change.getNetworkState() == AccessNetwork.INTERNET_NONE) {
             adapter.addHeaderView(headview);
-            chatsRecycleView.scrollToPosition(0);   //没有动画的滑动
-           // chatsRecycleView.smoothScrollToPosition(0);   //有动画的滑动
+//            chatsRecycleView.scrollToPosition(0);   //没有动画的滑动
+            chatsRecycleView.smoothScrollToPosition(0);   //有动画的滑动
         } else {
             adapter.removeHeaderView(headview);
         }

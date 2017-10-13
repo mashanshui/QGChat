@@ -1,7 +1,10 @@
 package com.example.qgchat.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -12,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +29,7 @@ import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
+import com.example.qgchat.service.QGService;
 import com.example.qgchat.util.UltimateBar;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +40,6 @@ import butterknife.ButterKnife;
 
 public class AtyMain extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
     @BindView(R.id.vp_main)
     ViewPager viewPager;
     @BindView(R.id.title_text)
@@ -46,6 +50,8 @@ public class AtyMain extends BaseActivity
     NavigationView navigationView;
 
     private MenuItem menuItem;
+    private Intent serviceIntent;
+    private QGService.QGBinder mBinder = null;
 
     //BottomNavigationView的监听事件
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -70,6 +76,19 @@ public class AtyMain extends BaseActivity
 
     };
 
+    private ServiceConnection connection=new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBinder= (QGService.QGBinder) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +102,10 @@ public class AtyMain extends BaseActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         titleText.setText("消息");
+
+        serviceIntent = new Intent(this, QGService.class);
+        startService(serviceIntent);
+        bindService(serviceIntent, connection, BIND_AUTO_CREATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -148,16 +171,35 @@ public class AtyMain extends BaseActivity
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            startActivity(intent);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                startActivity(intent);
+                //moveTaskToBack(true);
+            }
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
+//            Intent intent = new Intent(Intent.ACTION_MAIN);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intent.addCategory(Intent.CATEGORY_HOME);
+//            startActivity(intent);
+//            //moveTaskToBack(true);
+//        }
     }
 
     @Override
@@ -227,5 +269,12 @@ public class AtyMain extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(serviceIntent);
+        unbindService(connection);
     }
 }

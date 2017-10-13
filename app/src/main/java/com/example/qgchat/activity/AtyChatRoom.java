@@ -15,10 +15,20 @@ import android.widget.TextView;
 
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.AdapterChatRoom;
+import com.example.qgchat.bean.ReceivedMsg;
+import com.example.qgchat.bean.SendMsg;
 import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.db.DBChatMsg;
+import com.example.qgchat.db.DBUserItemMsg;
+import com.example.qgchat.db.DBUserList;
+import com.example.qgchat.socket.ParaseData;
+import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +52,7 @@ public class AtyChatRoom extends BaseActivity {
     private AdapterChatRoom adapter;
     private List<DBChatMsg> chatMsgList = new ArrayList<>();
     private UserItemMsg msg;
+    private String friend_account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +73,11 @@ public class AtyChatRoom extends BaseActivity {
                 finish();
             }
         });
-        msg=getIntent().getParcelableExtra("userItemMsg");
-        msg.getUsername();
-
-        setToolbarTitle("消息");
+        friend_account = getIntent().getStringExtra("friend_account");
+        List<DBUserList> userLists=DataSupport.where("account=?", friend_account).find(DBUserList.class);
+        if (!userLists.isEmpty()) {
+            setToolbarTitle(userLists.get(0).getUsername());
+        }
         initAdapter();
         initView();
     }
@@ -106,23 +118,44 @@ public class AtyChatRoom extends BaseActivity {
                 msg.setContent(myMsg.getText().toString());
                 msg.setMsgType(DBChatMsg.TYPE_SENT);
                 chatMsgList.add(msg);
+                DBUtil.saveChatMsg(friend_account,msg);
+
+                SendMsg sendMsg = new SendMsg();
+                sendMsg.setChatObj(friend_account);
+                sendMsg.setContent(myMsg.getText().toString());
+                sendMsg.setMsgType(SendMsg.TYPE_TEXT);
                 myMsg.setText("");
                 adapter.notifyItemInserted(chatMsgList.size()-1);
                 chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
+                ParaseData.sendChatMsg(sendMsg);
             }
         });
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(ReceivedMsg receivedMsg) {
+        loadData();
+        adapter.notifyItemInserted(chatMsgList.size()-1);
+        chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
+    }
+
     private void initAdapter() {
-
-        DBChatMsg msg = new DBChatMsg();
-        msg.setContent("hellow world!");
-        msg.setMsgType(DBChatMsg.TYPE_SENT);
-        chatMsgList.add(msg);
-
+        loadData();
         adapter = new AdapterChatRoom(chatMsgList);
         chatRoomRecycleView.setAdapter(adapter);
         chatRoomRecycleView.setLayoutManager(new LinearLayoutManager(this));
-
+        chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
     }
+
+    private void loadData() {
+        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.where("chatObj=?",friend_account).find(DBUserItemMsg.class,true);
+        if (!dbUserItemMsgs.isEmpty()) {
+            List<DBChatMsg> dbChatMsg=dbUserItemMsgs.get(0).getDbChatMsgList();
+            for (DBChatMsg chatMsg : dbChatMsg) {
+                chatMsgList.add(chatMsg);
+            }
+        }
+    }
+
 }

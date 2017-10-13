@@ -3,6 +3,7 @@ package com.example.qgchat.socket;
 
 import android.util.Log;
 
+import com.example.qgchat.bean.ReceivedMsg;
 import com.example.qgchat.util.EventBean;
 
 import org.greenrobot.eventbus.EventBus;
@@ -153,6 +154,8 @@ class ReceiveChatMsg {
             iconURL = matcher.group(3);
             MsgType = matcher.group(4);
             content = matcher.group(5);
+            int type = Integer.parseInt(MsgType);
+            EventBus.getDefault().post(new ReceivedMsg(type,iconURL,username,content,chatObj));
         }
         Log.i("info", "dealChatMsg: "+chatObj+username+iconURL+MsgType+content);
     }

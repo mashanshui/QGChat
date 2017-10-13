@@ -13,6 +13,14 @@ public class ReceivedMsg {
     private String content;
     private String chatObj;
 
+    public ReceivedMsg(int msgType, String iconURL, String username, String content, String chatObj) {
+        MsgType = msgType;
+        this.iconURL = iconURL;
+        this.username = username;
+        this.content = content;
+        this.chatObj = chatObj;
+    }
+
     public int getMsgType() {
         return MsgType;
     }

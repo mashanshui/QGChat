@@ -13,7 +13,7 @@ import java.net.Socket;
 
 public class ServerManager extends Thread {
     private static final String TAG = "ServerManager";
-    private static final String IP = "192.168.1.103";
+    private static final String IP = "172.16.6.66";
     public Socket socket = null;
     private String account = null;
     private String message = null;

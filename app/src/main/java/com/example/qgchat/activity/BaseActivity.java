@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.qgchat.broadcast.NetworkChangeReceiver;
@@ -36,11 +37,11 @@ import java.util.List;
  */
 
 public class BaseActivity extends AppCompatActivity {
-    private static final String TAG = "info";
+    public static final String TAG = "info";
     public ServerManager serverManager = ServerManager.getServerManager();
     private static PermissionListener permissionListener;
     private ProgressDialog dialog;
-    public String account = null;
+    public static String account = null;
     public String password = null;
 
 
@@ -124,7 +125,7 @@ public class BaseActivity extends AppCompatActivity {
                 serverManager.start();
             }
             //如果socket没有连接，使用Thread的run方法再次启动
-            if (serverManager.socket.isClosed()) {
+            if (serverManager.socket==null || serverManager.socket.isClosed()) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

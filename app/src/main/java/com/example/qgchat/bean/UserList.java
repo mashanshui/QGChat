@@ -9,10 +9,12 @@ import com.example.qgchat.adapter.ContactsRecycleAdapter;
 
 public class UserList implements MultiItemEntity{
 
+    public String account;
     public String iconURL;
     public String username;
 
-    public UserList(String iconURL, String username) {
+    public UserList(String account, String iconURL, String username) {
+        this.account = account;
         this.iconURL = iconURL;
         this.username = username;
     }

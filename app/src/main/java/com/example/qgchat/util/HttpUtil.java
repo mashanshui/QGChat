@@ -2,6 +2,7 @@ package com.example.qgchat.util;
 
 import java.io.File;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -15,6 +16,29 @@ import okhttp3.RequestBody;
  */
 
 public class HttpUtil {
+    /**
+     * 主域名
+     */
+    public static final String BaseURL = "http://172.16.6.66/QGChat";
+    /**
+     * 发送验证码
+     */
+    public static final String sendCodeURL = BaseURL+"/SendMsg";
+    /**
+     * 验证验证码
+     */
+    public static final String checkCodeURL = BaseURL+"/CheckMsg";
+
+    /**
+     * 获取分组信息
+     */
+    public static final String getGroupMessageURL = BaseURL + "/getMessage";
+
+    /**
+     * 获取账户信息
+     */
+    public static final String getAccountMessageURL = BaseURL + "/getAccountMessage";
+
     private static OkHttpClient client = null;
 
     public static void sendOkHttpRequest(String address, Callback callback) {
