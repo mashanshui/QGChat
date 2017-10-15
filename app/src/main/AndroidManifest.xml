@@ -26,13 +26,12 @@
         <activity android:name=".loginAndregister.AtyLogin" />
         <activity android:name=".activity.AtyMain" />
         <activity android:name=".TestActivity">
+             <!--<intent-filter>-->
+             <!--<action android:name="android.intent.action.MAIN" />-->
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
 
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
+             <!--<category android:name="android.intent.category.LAUNCHER" />-->
+             <!--</intent-filter>-->
         </activity>
         <activity android:name=".activity.AtyChatRoom" />
         <activity android:name=".loginAndregister.AtyRegister" />

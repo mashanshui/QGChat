@@ -20,6 +20,7 @@ import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
 import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.broadcast.NetworkChangeReceiver;
+import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.GridItemDecoration;
@@ -72,6 +73,7 @@ public class LayoutChats extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
+            loadData();
             adapter.notifyDataSetChanged();
         }
     }
@@ -123,16 +125,20 @@ public class LayoutChats extends Fragment {
 
     private void loadData() {
         userItemMsgList.clear();
-        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class);
+        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class,true);
         if (dbUserItemMsgs.isEmpty()) {
             return;
         }
         for (int i = dbUserItemMsgs.size() - 1; i >= 0; i--) {
             DBUserItemMsg dbUserItemMsg = dbUserItemMsgs.get(i);
+            //聊天记录的最后一条消息
+            List<DBChatMsg> msgList = dbUserItemMsg.getDbChatMsgList();
+            DBChatMsg chatMsg=msgList.get(msgList.size()-1);
+
             UserItemMsg userItemMsg = new UserItemMsg();
             userItemMsg.setIconURL(dbUserItemMsg.getIconURL());
             userItemMsg.setUsername(dbUserItemMsg.getUsername());
-            userItemMsg.setSign(dbUserItemMsg.getSign());
+            userItemMsg.setSign(chatMsg.getContent());
             userItemMsg.setChatObj(dbUserItemMsg.getChatObj());
             userItemMsgList.add(userItemMsg);
         }

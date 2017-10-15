@@ -3,7 +3,9 @@ package com.example.qgchat.util;
 import android.util.Log;
 
 import com.example.qgchat.bean.GroupMessage;
+import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.db.DBChatMsg;
+import com.example.qgchat.db.DBUser;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.db.DBUserList;
@@ -68,5 +70,13 @@ public class DBUtil {
 //            int i=itemMsg.updateAll("chatObj=?",userLists.get(0).getAccount());
 //            Log.i("info", "saveChatMsg: "+String.valueOf(i)+userLists.get(0).getAccount());
         }
+    }
+
+    public static void saveUser(UserBean bean){
+        DBUser dbUser = new DBUser();
+        dbUser.setUsername(bean.getUsername());
+        dbUser.setIconURL(bean.getIconURL());
+        dbUser.setAccount(bean.getAccount());
+        dbUser.saveOrUpdate("account=?", bean.getAccount());
     }
 }

@@ -3,55 +3,92 @@ package com.example.qgchat.activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.qgchat.R;
+import com.example.qgchat.adapter.DrawerAdapter;
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.addfriend.AtyAddFriend;
+import com.example.qgchat.bean.DrawerList;
+import com.example.qgchat.bean.UserBean;
+import com.example.qgchat.db.DBUser;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
 import com.example.qgchat.service.QGService;
+import com.example.qgchat.util.AccessNetwork;
+import com.example.qgchat.util.BeanUtil;
+import com.example.qgchat.util.DBUtil;
+import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 
+import org.litepal.crud.DataSupport;
+
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
-public class AtyMain extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+
+public class AtyMain extends BaseActivity {
     @BindView(R.id.vp_main)
     ViewPager viewPager;
     @BindView(R.id.title_text)
     TextView titleText;
     @BindView(R.id.navigation)
     BottomNavigationView bottomNavigationView;
-    @BindView(R.id.nav_view)
-    NavigationView navigationView;
+    @BindView(R.id.sdv_icon)
+    CircleImageView sdvIcon;
+    @BindView(R.id.nav_recycler)
+    RecyclerView navRecycler;
+    @BindView(R.id.tv_login)
+    TextView tvLogin;
+    @BindView(R.id.weather_state)
+    TextView weatherState;
+    @BindView(R.id.weather_quality)
+    TextView weatherQuality;
+    @BindView(R.id.weather_temp)
+    TextView weatherTemp;
+    @BindView(R.id.weather_area)
+    TextView weatherArea;
 
     private MenuItem menuItem;
     private Intent serviceIntent;
     private QGService.QGBinder mBinder = null;
+    private DrawerAdapter drawerAdapter;
+    private List<DrawerList> drawerList = Arrays.asList(
+            new DrawerList(R.drawable.ic_search_black_24dp, R.string.drawer_menu_search),
+            new DrawerList(R.drawable.ic_settings_black_24dp, R.string.drawer_menu_setting)
+    );
 
     //BottomNavigationView的监听事件
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -76,11 +113,11 @@ public class AtyMain extends BaseActivity
 
     };
 
-    private ServiceConnection connection=new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mBinder= (QGService.QGBinder) service;
+            mBinder = (QGService.QGBinder) service;
         }
 
         @Override
@@ -97,6 +134,7 @@ public class AtyMain extends BaseActivity
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBarForDrawer(ContextCompat.getColor(this, R.color.colorPrimary));
         ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -107,7 +145,7 @@ public class AtyMain extends BaseActivity
         startService(serviceIntent);
         bindService(serviceIntent, connection, BIND_AUTO_CREATE);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -115,19 +153,73 @@ public class AtyMain extends BaseActivity
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 findViewById(R.id.content).setTranslationX(slideOffset * drawerView.getWidth());
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    loadWeather();
+                }
             }
         });
         toggle.syncState();
-
-        setNavigationHeadImage(R.drawable.headicon);
-        navigationView.setNavigationItemSelectedListener(this);
+        setDrawerLayout();
         initViews();
     }
 
-    private void setNavigationHeadImage(int drawable) {
-        View headView = navigationView.getHeaderView(0);
-        ImageView imageView = (ImageView) headView.findViewById(R.id.imageView);
-        Glide.with(this).load(drawable).into(imageView);
+    private void loadWeather() {
+        if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE) {
+
+        }
+    }
+
+    private void setDrawerLayout() {
+        SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
+        account = preferences.getString("account", "");
+
+        if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE) {
+            String url = HttpUtil.getAccountMessageURL + "?account=" + account;
+            HttpUtil.sendOkHttpRequest(url, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String result = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            UserBean bean = BeanUtil.handleUserBeanResponse(result);
+                            DBUtil.saveUser(bean);
+                            setDrawerHander(bean.getIconURL(),bean.getUsername());
+                        }
+                    });
+                }
+
+            });
+        } else {
+            DBUser bean = DataSupport.findFirst(DBUser.class);
+            setDrawerHander(bean.getIconURL(),bean.getUsername());
+        }
+
+        drawerAdapter = new DrawerAdapter(drawerList);
+        navRecycler.setAdapter(drawerAdapter);
+        navRecycler.setLayoutManager(new LinearLayoutManager(AtyMain.this));
+        drawerAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                DrawerList list = drawerList.get(position);
+                switch (list.getResTitleId()) {
+                    case R.string.drawer_menu_search:
+                        break;
+                    case R.string.drawer_menu_setting:
+                        break;
+                }
+            }
+        });
+    }
+
+    private void setDrawerHander(String icon,String title) {
+        Glide.with(AtyMain.this).load(icon).into(sdvIcon);
+        tvLogin.setText(title);
     }
 
     private void initViews() {
@@ -246,35 +338,11 @@ public class AtyMain extends BaseActivity
         return super.onPrepareOptionsPanel(view, menu);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         stopService(serviceIntent);
         unbindService(connection);
     }
+
 }

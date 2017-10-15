@@ -14,7 +14,6 @@ public class DBUserItemMsg extends DataSupport {
     private String chatObj;
     private String iconURL;
     private String username;
-    private String sign;
     private List<DBChatMsg> dbChatMsgList = new ArrayList<>();
 
     public String getChatObj() {
@@ -55,13 +54,5 @@ public class DBUserItemMsg extends DataSupport {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getSign() {
-        return sign;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign;
     }
 }

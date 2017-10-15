@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.example.qgchat.db.DBChatMsg;
+import com.example.qgchat.db.DBUser;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.db.DBUserList;
@@ -57,14 +58,7 @@ public class TestActivity extends AppCompatActivity {
         msg.save();
 //        List<DBChatMsg> chatMsgs =DataSupport.findAll(DBChatMsg.class);
 //        Log.i("info", "onCreate: "+chatMsgs.get(0).getContent());
-        List<DBChatMsg> chatMsgs = new ArrayList<>();
-        chatMsgs.add(msg);
-        DBUserItemMsg itemMsg = new DBUserItemMsg();
-        itemMsg.setDbChatMsgList(chatMsgs);
-        itemMsg.save();
 
-        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class,true);
-        Log.i("info", "loadData: ------------"+dbUserItemMsgs.get(0).getDbChatMsgList().get(0).getContent());
 //        int i=itemMsg.updateAll("chatObj=?","13956821111");
 //        Log.i("info", "saveChatMsg: "+String.valueOf(i));
 
@@ -86,5 +80,6 @@ public class TestActivity extends AppCompatActivity {
 //        msg.setMsgType(DBChatMsg.TYPE_RECEIVED);
 //        msg.save();
 //        Log.i(TAG, "onCreate: "+String.valueOf(msg.getId()));
+
     }
 }

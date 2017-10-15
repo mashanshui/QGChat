@@ -19,4 +19,8 @@
 
     <string name="permission_request_denied">Permission request denied</string>
     <string name="error_gif">x or y bound size should be at least %1$dpx and file size should be no more than %2$sM</string>
+
+    <!-- drawer_menu_text-->
+    <string name="drawer_menu_search">搜索</string>
+    <string name="drawer_menu_setting">设置</string>
 </resources>

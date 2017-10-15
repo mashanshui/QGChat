@@ -39,6 +39,11 @@ public class HttpUtil {
      */
     public static final String getAccountMessageURL = BaseURL + "/getAccountMessage";
 
+    /**
+     * 获取天气信息（和风天气）
+     */
+    public static final String getWeatherURL = "https://free-api.heweather.com/v5/now?city=CITY&key=07bf16f33106400baf180ec36a061501";
+
     private static OkHttpClient client = null;
 
     public static void sendOkHttpRequest(String address, Callback callback) {

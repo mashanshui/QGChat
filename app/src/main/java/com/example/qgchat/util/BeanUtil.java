@@ -2,6 +2,7 @@ package com.example.qgchat.util;
 
 import com.example.qgchat.bean.GroupMessage;
 import com.example.qgchat.bean.UserBean;
+import com.example.qgchat.db.DBUser;
 import com.google.gson.Gson;
 
 /**
