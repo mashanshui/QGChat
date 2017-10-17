@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.bean.ReceivedMsg;

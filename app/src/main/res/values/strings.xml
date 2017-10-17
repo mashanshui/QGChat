@@ -22,5 +22,8 @@
 
     <!-- drawer_menu_text-->
     <string name="drawer_menu_search">搜索</string>
+    <string name="drawer_menu_share">分享</string>
+    <string name="drawer_menu_camera">相机</string>
+    <string name="drawer_menu_gallery">相册</string>
     <string name="drawer_menu_setting">设置</string>
 </resources>

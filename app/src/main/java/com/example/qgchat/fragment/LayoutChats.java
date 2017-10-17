@@ -4,6 +4,8 @@ package com.example.qgchat.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,12 +20,15 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.qgchat.R;
 import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.adapter.ChatRecyclerAdapter;
+import com.example.qgchat.bean.ReceivedMsg;
 import com.example.qgchat.bean.UserItemMsg;
 import com.example.qgchat.broadcast.NetworkChangeReceiver;
 import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.util.AccessNetwork;
+import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.GridItemDecoration;
+import com.example.qgchat.util.NotificationUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +43,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.media.CamcorderProfile.get;
+import static com.baidu.location.h.k.m;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,8 +97,7 @@ public class LayoutChats extends Fragment {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        loadData();
-                        adapter.notifyDataSetChanged();
+                        handler.sendEmptyMessage(1);
                         refreshRecycleView.refreshComplete();
                     }
                 }, 1000);
@@ -105,10 +110,10 @@ public class LayoutChats extends Fragment {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                UserItemMsg userItemMsg=userItemMsgList.get(position);
+                UserItemMsg userItemMsg = userItemMsgList.get(position);
                 Intent intent = new Intent(getActivity(), AtyChatRoom.class);
                 intent.putExtra("friend_account", userItemMsg.getChatObj());
-                startActivityForResult(intent,1);
+                startActivityForResult(intent, 1);
             }
         });
         adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
@@ -118,14 +123,14 @@ public class LayoutChats extends Fragment {
                 return false;
             }
         });
-        chatsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(),R.drawable.recycleview_divider));
+        chatsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(), R.drawable.recycleview_divider));
         chatsRecycleView.setAdapter(adapter);
         chatsRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void loadData() {
         userItemMsgList.clear();
-        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class,true);
+        List<DBUserItemMsg> dbUserItemMsgs = DataSupport.findAll(DBUserItemMsg.class, true);
         if (dbUserItemMsgs.isEmpty()) {
             return;
         }
@@ -133,7 +138,7 @@ public class LayoutChats extends Fragment {
             DBUserItemMsg dbUserItemMsg = dbUserItemMsgs.get(i);
             //聊天记录的最后一条消息
             List<DBChatMsg> msgList = dbUserItemMsg.getDbChatMsgList();
-            DBChatMsg chatMsg=msgList.get(msgList.size()-1);
+            DBChatMsg chatMsg = msgList.get(msgList.size() - 1);
 
             UserItemMsg userItemMsg = new UserItemMsg();
             userItemMsg.setIconURL(dbUserItemMsg.getIconURL());
@@ -142,6 +147,26 @@ public class LayoutChats extends Fragment {
             userItemMsg.setChatObj(dbUserItemMsg.getChatObj());
             userItemMsgList.add(userItemMsg);
         }
+    }
+
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what==1) {
+                loadData();
+                adapter.notifyDataSetChanged();
+            }
+        }
+    };
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(ReceivedMsg receivedMsg) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(500);
+                handler.sendEmptyMessage(1);
+            }
+        }).start();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

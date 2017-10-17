@@ -51,7 +51,7 @@ public class LayoutMoments extends Fragment {
         SimpleDateFormat format3 = new SimpleDateFormat("HH:mm");
         String time3 = format3.format(Calendar.getInstance().getTime());
         for (int i = 0; i < 10; i++) {
-            UserMoments userMoments=new UserMoments("","马山水",time3,"无聊!");
+            UserMoments userMoments=new UserMoments("","马山水",time3,"空");
             userMomentsList.add(userMoments);
         }
 

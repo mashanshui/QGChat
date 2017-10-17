@@ -126,7 +126,7 @@ public class AtyChatRoom extends BaseActivity {
                 sendMsg.setMsgType(SendMsg.TYPE_TEXT);
                 myMsg.setText("");
                 adapter.notifyItemInserted(chatMsgList.size()-1);
-                chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
+                chatRoomRecycleView.smoothScrollToPosition(chatMsgList.size()-1);
                 ParaseData.sendChatMsg(sendMsg);
             }
         });
@@ -137,7 +137,7 @@ public class AtyChatRoom extends BaseActivity {
     public void onMessage(ReceivedMsg receivedMsg) {
         loadData();
         adapter.notifyItemInserted(chatMsgList.size()-1);
-        chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
+        chatRoomRecycleView.smoothScrollToPosition(chatMsgList.size()-1);
     }
 
     private void initAdapter() {

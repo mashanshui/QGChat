@@ -2,6 +2,7 @@ package com.example.qgchat.util;
 
 import com.example.qgchat.bean.GroupMessage;
 import com.example.qgchat.bean.UserBean;
+import com.example.qgchat.bean.Weather;
 import com.example.qgchat.db.DBUser;
 import com.google.gson.Gson;
 
@@ -20,5 +21,11 @@ public class BeanUtil {
         Gson gson = new Gson();
         UserBean userBean = gson.fromJson(response, UserBean.class);
         return userBean;
+    }
+
+    public static Weather handleWeatherResponse(String response) {
+        Gson gson = new Gson();
+        Weather weather = gson.fromJson(response, Weather.class);
+        return weather;
     }
 }

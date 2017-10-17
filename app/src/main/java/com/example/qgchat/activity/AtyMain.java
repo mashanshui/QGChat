@@ -1,5 +1,6 @@
 package com.example.qgchat.activity;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -17,12 +18,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -32,10 +38,13 @@ import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.DrawerList;
 import com.example.qgchat.bean.UserBean;
+import com.example.qgchat.bean.Weather;
 import com.example.qgchat.db.DBUser;
+import com.example.qgchat.db.DBWeather;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
+import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.service.QGService;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.BeanUtil;
@@ -57,6 +66,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static com.baidu.location.h.k.l;
+import static com.baidu.location.h.k.o;
+import static com.baidu.location.h.k.w;
+import static com.example.qgchat.util.BeanUtil.handleWeatherResponse;
 
 
 public class AtyMain extends BaseActivity {
@@ -81,13 +95,26 @@ public class AtyMain extends BaseActivity {
     @BindView(R.id.weather_area)
     TextView weatherArea;
 
+    public LocationClient mLocationClient = null;
+    /**
+     * 经度
+     */
+    public static double lon = 0;
+    /**
+     * 纬度
+     */
+    public static double lat = 0;
+
     private MenuItem menuItem;
     private Intent serviceIntent;
     private QGService.QGBinder mBinder = null;
     private DrawerAdapter drawerAdapter;
     private List<DrawerList> drawerList = Arrays.asList(
             new DrawerList(R.drawable.ic_search_black_24dp, R.string.drawer_menu_search),
-            new DrawerList(R.drawable.ic_settings_black_24dp, R.string.drawer_menu_setting)
+            new DrawerList(R.drawable.ic_settings_black_24dp, R.string.drawer_menu_setting),
+            new DrawerList(R.drawable.ic_menu_share, R.string.drawer_menu_share),
+            new DrawerList(R.drawable.ic_menu_camera, R.string.drawer_menu_camera),
+            new DrawerList(R.drawable.ic_menu_gallery, R.string.drawer_menu_gallery)
     );
 
     //BottomNavigationView的监听事件
@@ -134,6 +161,10 @@ public class AtyMain extends BaseActivity {
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBarForDrawer(ContextCompat.getColor(this, R.color.colorPrimary));
         ButterKnife.bind(this);
+        //声明LocationClient类
+        mLocationClient = new LocationClient(getApplicationContext());
+        //注册监听函数
+        mLocationClient.registerLocationListener(new MyLocationListener());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -153,7 +184,7 @@ public class AtyMain extends BaseActivity {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 findViewById(R.id.content).setTranslationX(slideOffset * drawerView.getWidth());
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                if (slideOffset==1) {
                     loadWeather();
                 }
             }
@@ -161,11 +192,77 @@ public class AtyMain extends BaseActivity {
         toggle.syncState();
         setDrawerLayout();
         initViews();
+        requestRuntimePermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
+            @Override
+            public void onGranted() {
+                initLocation();
+                mLocationClient.start();
+            }
+
+            @Override
+            public void onDenied(List<String> deniedPermission) {
+
+            }
+        });
+    }
+
+    private void initLocation() {
+        LocationClientOption option = new LocationClientOption();
+        //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setLocationMode(LocationClientOption.LocationMode.Battery_Saving);
+        //可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+//        option.setScanSpan(5000);
+        //可选，设置是否需要地址信息，默认不需要
+        //option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
+    }
+
+    public class MyLocationListener extends BDAbstractLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            lon = bdLocation.getLongitude();    //获取经度信息
+            lat = bdLocation.getLatitude();    //获取纬度信息
+        }
+
     }
 
     private void loadWeather() {
-        if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE) {
+        if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE && lat != 0 && lon != 0) {
+            String url = HttpUtil.getWeatherURL.replace("CITY", lon + "," + lat);
+            HttpUtil.sendOkHttpRequest(url, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
 
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String result = response.body().string();
+                    Weather weather=BeanUtil.handleWeatherResponse(result);
+                    DBUtil.saveWeather(serverManager.getAccount(),weather);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateWeather();
+                        }
+                    });
+                }
+            });
+        } else {
+            updateWeather();
+        }
+    }
+
+    private void updateWeather() {
+        DBWeather weather = DataSupport.findFirst(DBWeather.class);
+        if (weather != null) {
+            weatherArea.setText(weather.getCity());
+            weatherState.setText(weather.getTxt());
+            weatherTemp.setText(weather.getTmp()+"°");
+            weatherQuality.setText(weather.getDir()+weather.getSc());
         }
     }
 
@@ -184,14 +281,16 @@ public class AtyMain extends BaseActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     final String result = response.body().string();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            UserBean bean = BeanUtil.handleUserBeanResponse(result);
-                            DBUtil.saveUser(bean);
-                            setDrawerHander(bean.getIconURL(),bean.getUsername());
-                        }
-                    });
+                    if (!result.equals("failed")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                UserBean bean = BeanUtil.handleUserBeanResponse(result);
+                                DBUtil.saveUser(bean);
+                                setDrawerHander(bean.getIconURL(),bean.getUsername());
+                            }
+                        });
+                    }
                 }
 
             });
@@ -261,6 +360,7 @@ public class AtyMain extends BaseActivity {
             }
         });
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -341,6 +441,7 @@ public class AtyMain extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mLocationClient.stop();
         stopService(serviceIntent);
         unbindService(connection);
     }

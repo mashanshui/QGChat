@@ -30,18 +30,21 @@ public class NotificationUtil {
                 .setContentTitle(title)
                 .setContentText(content)
                 .setWhen(System.currentTimeMillis())
-//                .setSmallIcon(R.mipmap.ic_launcher)
-//                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
-//                .setVibrate(new long[]{0,1000})  //震动
-//                .setLights(Color.GREEN,1000,1000)  //led灯
+                .setSmallIcon(R.drawable.headicon)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.headicon))
                 .setDefaults(NotificationCompat.DEFAULT_ALL) //系统自动选择声音灯光和震动
                 .setContentIntent(pendingIntent)
                 .setFullScreenIntent(pendingIntent,true)
                 .setAutoCancel(true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
         manager.notify(1, notification);
+
+        //                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
+//                .setVibrate(new long[]{0,1000})  //震动
+//                .setLights(Color.GREEN,1000,1000)  //led灯
     }
 
     public static boolean isBackground(Context context) {
@@ -52,6 +55,7 @@ public class NotificationUtil {
                 .getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
             if (TextUtils.equals(appProcess.processName, context.getPackageName())) {
+                Log.i("info", "isBackground: "+appProcess.importance);
                 boolean isBackground = (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND || appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE);
                 boolean isLockedState = keyguardManager.inKeyguardRestrictedInputMode();
                 return isBackground || isLockedState;

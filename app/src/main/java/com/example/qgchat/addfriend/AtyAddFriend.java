@@ -82,7 +82,7 @@ public class AtyAddFriend extends BaseActivity {
 
     private void showDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AtyAddFriend.this);
-        dialogBuilder.setTitle("添加好友");
+//        dialogBuilder.setTitle("添加好友");
         dialogBuilder.setMessage("确认添加");
         dialogBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override

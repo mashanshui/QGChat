@@ -148,7 +148,7 @@ public class RegisterFragment4 extends Fragment {
         String filename = ((AtyRegister) getActivity()).phoneNumber;
         param.put("account", filename);
         ((AtyRegister) getActivity()).showBufferDialog();
-        HttpUtil.uploadImage("http://www.chemaxianxing.com/QGChatHttp/UploadIcon", param, imagePath, filename, new Callback() {
+        HttpUtil.uploadImage(HttpUtil.uploadImageURL, param, imagePath, filename, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -162,13 +162,19 @@ public class RegisterFragment4 extends Fragment {
 
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((AtyRegister) getActivity()).dismissBufferDialog();
-                        EventBus.getDefault().post(new Icon(true));
-                    }
-                });
+                String result = response.body().string();
+                if (result.equals("200")) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((AtyRegister) getActivity()).dismissBufferDialog();
+                            Toast.makeText(getActivity(), "上传成功", Toast.LENGTH_SHORT).show();
+                            EventBus.getDefault().post(new Icon(true));
+                        }
+                    });
+                } else {
+                    Toast.makeText(getActivity(), "上传失败", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

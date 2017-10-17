@@ -16,10 +16,13 @@ import okhttp3.RequestBody;
  */
 
 public class HttpUtil {
+
+    //public static final String BaseWeb = "http://172.16.6.66";
+    public static final String BaseWeb = "http://www.chemaxianxing.com";
     /**
      * 主域名
      */
-    public static final String BaseURL = "http://172.16.6.66/QGChat";
+    public static final String BaseURL = BaseWeb+"/QGChat";
     /**
      * 发送验证码
      */
@@ -28,7 +31,10 @@ public class HttpUtil {
      * 验证验证码
      */
     public static final String checkCodeURL = BaseURL+"/CheckMsg";
-
+    /**
+     * 上传图片
+     */
+    public static final String uploadImageURL = BaseURL+"/UploadIcon";
     /**
      * 获取分组信息
      */
@@ -80,7 +86,6 @@ public class HttpUtil {
 //                .addFormDataPart("file", "head_image", fileBody)
 //                .addFormDataPart("user", user)
 //                .build();
-
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)

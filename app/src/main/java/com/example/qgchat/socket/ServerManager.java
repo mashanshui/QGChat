@@ -3,6 +3,9 @@ package com.example.qgchat.socket;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.os.SystemClock;
+
+import com.example.qgchat.util.HttpUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,7 +16,7 @@ import java.net.Socket;
 
 public class ServerManager extends Thread {
     private static final String TAG = "ServerManager";
-    private static final String IP = "172.16.6.66";
+    private static final String IP = "139.199.158.151";
     public Socket socket = null;
     private String account = null;
     private String message = null;
@@ -34,7 +37,7 @@ public class ServerManager extends Thread {
             handlerThread = new HandlerThread("sendMessageThread");
             handlerThread.start();
         }
-        handler=new Handler(handlerThread.getLooper()){
+        handler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 startSend(msg.obj.toString());
@@ -43,9 +46,18 @@ public class ServerManager extends Thread {
     }
 
     public void run() {
+        socket = null;
+        while (socket == null) {
+            try {
+                socket = new Socket(IP, 27777);
+                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+            } catch (IOException e) {
+                SystemClock.sleep(1000);
+                e.printStackTrace();
+            }
+        }
+
         try {
-            socket = new Socket(IP, 27777);
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
             String m = null;
             String line;
@@ -95,7 +107,7 @@ public class ServerManager extends Thread {
         }
     }
 
-    public void sendMessage(String msg){
+    public void sendMessage(String msg) {
         Message tempMsg = handler.obtainMessage();
         tempMsg.obj = msg.toString();
         handler.sendMessage(tempMsg);

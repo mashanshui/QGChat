@@ -3,7 +3,7 @@
 
     <dbname value="QGChat" />
 
-    <version value="2" />
+    <version value="1" />
 
     <list>
         <mapping class="com.example.qgchat.db.DBUserGruop"></mapping>
@@ -12,6 +12,7 @@
         <mapping class="com.example.qgchat.db.DBUserMoments"></mapping>
         <mapping class="com.example.qgchat.db.DBChatMsg"></mapping>
         <mapping class="com.example.qgchat.db.DBUser"></mapping>
+        <mapping class="com.example.qgchat.db.DBWeather"></mapping>
     </list>
 
 </litepal>

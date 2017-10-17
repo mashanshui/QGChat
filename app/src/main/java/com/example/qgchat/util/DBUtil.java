@@ -4,11 +4,13 @@ import android.util.Log;
 
 import com.example.qgchat.bean.GroupMessage;
 import com.example.qgchat.bean.UserBean;
+import com.example.qgchat.bean.Weather;
 import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.db.DBUser;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.db.DBUserList;
+import com.example.qgchat.db.DBWeather;
 
 import org.litepal.crud.DataSupport;
 
@@ -78,5 +80,23 @@ public class DBUtil {
         dbUser.setIconURL(bean.getIconURL());
         dbUser.setAccount(bean.getAccount());
         dbUser.saveOrUpdate("account=?", bean.getAccount());
+    }
+
+    public static void saveWeather(String account,Weather weather) {
+        DBWeather dbWeather = new DBWeather();
+        dbWeather.setAccount(account);
+        Weather.HeWeather5Bean weather5Bean=weather.getHeWeather5().get(0);
+        if (weather5Bean.getStatus().equals("ok") && account!=null) {
+            Weather.HeWeather5Bean.BasicBean basic=weather5Bean.getBasic();
+            dbWeather.setCity(basic.getCity());
+            Weather.HeWeather5Bean.NowBean now = weather5Bean.getNow();
+            dbWeather.setTmp(now.getTmp());
+            Weather.HeWeather5Bean.NowBean.CondBean cond = now.getCond();
+            dbWeather.setTxt(cond.getTxt());
+            Weather.HeWeather5Bean.NowBean.WindBean wind = now.getWind();
+            dbWeather.setDir(wind.getDir());
+            dbWeather.setSc(wind.getSc());
+            dbWeather.saveOrUpdate("account=?", account);
+        }
     }
 }
