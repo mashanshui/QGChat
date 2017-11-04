@@ -18,7 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +29,6 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.qgchat.R;
 import com.example.qgchat.adapter.DrawerAdapter;
@@ -39,19 +37,26 @@ import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.DrawerList;
 import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.bean.Weather;
+import com.example.qgchat.db.DBChatMsg;
 import com.example.qgchat.db.DBUser;
+import com.example.qgchat.db.DBUserGruop;
+import com.example.qgchat.db.DBUserItemMsg;
+import com.example.qgchat.db.DBUserList;
+import com.example.qgchat.db.DBUserMoments;
 import com.example.qgchat.db.DBWeather;
 import com.example.qgchat.fragment.LayoutChats;
 import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.service.QGService;
+import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 
+import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
@@ -67,10 +72,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.baidu.location.h.k.l;
-import static com.baidu.location.h.k.o;
-import static com.baidu.location.h.k.w;
-import static com.example.qgchat.util.BeanUtil.handleWeatherResponse;
+import static com.baidu.location.h.k.D;
+import static com.example.qgchat.service.QGService.account;
 
 
 public class AtyMain extends BaseActivity {
@@ -114,7 +117,8 @@ public class AtyMain extends BaseActivity {
             new DrawerList(R.drawable.ic_settings_black_24dp, R.string.drawer_menu_setting),
             new DrawerList(R.drawable.ic_menu_share, R.string.drawer_menu_share),
             new DrawerList(R.drawable.ic_menu_camera, R.string.drawer_menu_camera),
-            new DrawerList(R.drawable.ic_menu_gallery, R.string.drawer_menu_gallery)
+            new DrawerList(R.drawable.ic_menu_gallery, R.string.drawer_menu_gallery),
+            new DrawerList(R.drawable.ic_exit_black_24dp,R.string.exit_login)
     );
 
     //BottomNavigationView的监听事件
@@ -145,6 +149,9 @@ public class AtyMain extends BaseActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBinder = (QGService.QGBinder) service;
+            if (serverManager.getAccount() == null) {
+                EventBus.getDefault().post(new ServerManager.Connection(true));
+            }
         }
 
         @Override
@@ -157,7 +164,6 @@ public class AtyMain extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aty_main);
-        autoLogin();
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBarForDrawer(ContextCompat.getColor(this, R.color.colorPrimary));
         ButterKnife.bind(this);
@@ -207,6 +213,7 @@ public class AtyMain extends BaseActivity {
             }
         });
     }
+
 
     private void initLocation() {
         LocationClientOption option = new LocationClientOption();
@@ -311,9 +318,39 @@ public class AtyMain extends BaseActivity {
                         break;
                     case R.string.drawer_menu_setting:
                         break;
+                    case R.string.exit_login:
+                        clearSharePreferences();
+                        deleteDataBase();
+                        restartApplication();
+                        break;
                 }
             }
         });
+    }
+
+    private void deleteDataBase() {
+        DataSupport.deleteAll(DBUserGruop.class);
+        DataSupport.deleteAll(DBUserItemMsg.class);
+        DataSupport.deleteAll(DBUserList.class);
+        DataSupport.deleteAll(DBUserMoments.class);
+        DataSupport.deleteAll(DBChatMsg.class);
+        DataSupport.deleteAll(DBUser.class);
+        DataSupport.deleteAll(DBWeather.class);
+    }
+
+    private void clearSharePreferences() {
+        SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove("login");
+        editor.remove("account");
+        editor.remove("password");
+        editor.apply();
+    }
+
+    private void restartApplication() {
+        final Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void setDrawerHander(String icon,String title) {

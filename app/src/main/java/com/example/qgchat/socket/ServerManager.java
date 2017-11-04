@@ -4,8 +4,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 
-import com.example.qgchat.util.HttpUtil;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,8 +24,11 @@ public class ServerManager extends Thread {
     private BufferedReader bufferedReader = null;
     private BufferedWriter bufferedWriter = null;
     public ReceiveChatMsg receiveChatMsg;
-    public HandlerThread handlerThread = null;
-    public Handler handler = null;
+    public HandlerThread sendUrgentDataThread = null;
+    public Handler sendUrgentDataHandler = null;
+    public HandlerThread sendMessageThread = null;
+    public Handler sendMessageHandler = null;
+    private boolean status = true;
     private static final ServerManager serverManager = new ServerManager();
 
     public static ServerManager getServerManager() {
@@ -33,67 +37,109 @@ public class ServerManager extends Thread {
 
     private ServerManager() {
         receiveChatMsg = new ReceiveChatMsg();
-        if (handlerThread == null) {
-            handlerThread = new HandlerThread("sendMessageThread");
-            handlerThread.start();
+        if (sendUrgentDataThread == null) {
+            sendUrgentDataThread = new HandlerThread("sendUrgentDataThread");
+            sendUrgentDataThread.start();
         }
-        handler = new Handler(handlerThread.getLooper()) {
+        if (sendMessageThread == null) {
+            sendMessageThread = new HandlerThread("sendMessageThread");
+            sendMessageThread.start();
+        }
+        sendUrgentDataHandler = new Handler(sendUrgentDataThread.getLooper()){
             @Override
             public void handleMessage(Message msg) {
+                if (msg.what == 1) {
+                    status=true;
+                    while (status) {
+                        try {
+//                            Log.i("info", "run: mythread");
+                            SystemClock.sleep(2000);
+                            if (socket != null) {
+                                socket.sendUrgentData(0xFF);
+                            }
+                        } catch (IOException e) {
+                            status = false;
+                            disconnect();
+                        }
+                    }
+                }
+            }
+        };
+        sendMessageHandler = new Handler(sendMessageThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+//                Log.i("info", "handleMessage: ");
                 startSend(msg.obj.toString());
             }
         };
     }
 
-    public void run() {
-        socket = null;
-        while (socket == null) {
-            try {
-                socket = new Socket(IP, 27777);
-                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-            } catch (IOException e) {
-                SystemClock.sleep(1000);
-                e.printStackTrace();
-            }
-        }
 
-        try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-            String m = null;
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (!line.equals("-1")) {
-                    m += line;
-                } else {
-//                    Log.i("TAG", "receive : " + m);
-                    receiveChatMsg.delMessage(m);
-                    message = m;
-                    m = null;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+    public void run() {
+        while (true) {
             try {
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
+                Log.i("info", "run: reply");
+                connect();
+                sendUrgentDataHandler.sendEmptyMessage(1);
+                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+                EventBus.getDefault().post(new Connection(true));
+                String m = null;
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (!line.equals("-1")) {
+                        m += line;
+                    } else {
+//                    Log.i("TAG", "receive : " + m);
+                        receiveChatMsg.delMessage(m);
+                        message = m;
+                        m = null;
+                    }
                 }
-                if (bufferedReader != null) {
-                    bufferedReader.close();
-                }
-                if (socket != null) {
-                    socket.close();
-                }
-//                Log.i("info", "连接断开------");
-                setAccount(null);
             } catch (IOException e) {
                 e.printStackTrace();
+//                Log.i("info", "run: catch");
+            } finally {
+                disconnect();
+//                Log.i("info", "run: finally");
             }
         }
     }
 
 
+    public void connect() {
+        socket = null;
+        while (socket == null) {
+            try {
+                Log.i("info", "run: conn");
+                socket = new Socket(IP, 27777);
+            } catch (IOException e) {
+                SystemClock.sleep(1000);
+            }
+        }
+    }
+
+    public void disconnect() {
+        try {
+            if (bufferedWriter != null) {
+                bufferedWriter.close();
+            }
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+            setAccount(null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void startSend(String msg) {
+//        Log.i("info", "startSend: ");
         try {
             while (socket == null) ;
             if (bufferedWriter != null) {
@@ -108,9 +154,10 @@ public class ServerManager extends Thread {
     }
 
     public void sendMessage(String msg) {
-        Message tempMsg = handler.obtainMessage();
+//        Log.i("info", "sendMessage: ");
+        Message tempMsg = sendMessageHandler.obtainMessage();
         tempMsg.obj = msg.toString();
-        handler.sendMessage(tempMsg);
+        sendMessageHandler.sendMessage(tempMsg);
     }
 
     public String getMessage() {
@@ -125,6 +172,22 @@ public class ServerManager extends Thread {
             }
         }
         return message;
+    }
+
+    public static class Connection{
+        private boolean isConnection;
+
+        public boolean isConnection() {
+            return isConnection;
+        }
+
+        public void setConnection(boolean connection) {
+            isConnection = connection;
+        }
+
+        public Connection(boolean isConnection) {
+            this.isConnection = isConnection;
+        }
     }
 
     public void setMessage(String message) {

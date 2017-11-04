@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +28,9 @@ import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.IOException;
 
 import butterknife.BindView;
@@ -37,6 +41,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.qgchat.service.QGService.account;
 import static java.lang.System.load;
 
 public class AtyLogin extends BaseActivity {
@@ -55,6 +60,8 @@ public class AtyLogin extends BaseActivity {
     TextView forgetPassword;
     @BindView(R.id.register)
     TextView register;
+    private String account=null;
+    private String password=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +102,9 @@ public class AtyLogin extends BaseActivity {
                                     @Override
                                     public void run() {
                                         UserBean bean = BeanUtil.handleUserBeanResponse(result);
-                                        Glide.with(AtyLogin.this).load(bean.getIconURL()).diskCacheStrategy(DiskCacheStrategy.NONE).into(icon);
+                                        if (bean.getIconURL() != null) {
+                                            Glide.with(AtyLogin.this).load(bean.getIconURL()).diskCacheStrategy(DiskCacheStrategy.NONE).into(icon);
+                                        }
                                     }
                                 });
                             }
@@ -142,15 +151,17 @@ public class AtyLogin extends BaseActivity {
      *
      * @param login 登录结果的返回
      */
-    @Override
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LoginEvent login) {
-        if (login.isLogin()) {
+        SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
+        /** 是否登陆过，也就是是否有缓存的帐号密码 */
+        boolean logined = preferences.getBoolean("login", false);
+        if (login.isLogin() && !logined) {
             /**
              * 将是否登录设置为true
              * 将帐号密码保存在本地
              */
             dismissBufferDialog();
-            SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean("login", true);
             editor.putString("account", account);

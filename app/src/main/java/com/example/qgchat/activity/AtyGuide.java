@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AtyGuide extends BaseActivity implements ViewPager.OnPageChangeListener{
+public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChangeListener{
     @BindView(R.id.vp_guide)
     ViewPager viewPager;
     @BindView(R.id.iv_indicator_dot1)

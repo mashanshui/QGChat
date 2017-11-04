@@ -1,5 +1,6 @@
 package com.example.qgchat.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -132,6 +133,12 @@ public class AtyChatRoom extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        loadData();
+        adapter.notifyDataSetChanged();
+        chatRoomRecycleView.scrollToPosition(chatMsgList.size()-1);
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(ReceivedMsg receivedMsg) {

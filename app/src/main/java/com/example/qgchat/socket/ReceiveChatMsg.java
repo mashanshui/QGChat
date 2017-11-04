@@ -134,6 +134,7 @@ class ReceiveChatMsg {
         Pattern pattern = Pattern.compile(p);
         Matcher matcher = pattern.matcher(msg);
         if (matcher.find()) {
+//            Log.i("info", "dealLogin: ");
             EventBus.getDefault().post(new LoginEvent(matcher.group(1).equals("1")));
         }
     }

@@ -1,6 +1,7 @@
 package com.example.qgchat.socket;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.qgchat.bean.SendMsg;
@@ -23,6 +24,7 @@ public class ParaseData {
         if (StringUtil.isEmpty(account,password)) {
             return;
         }
+//        Log.i("info", "requestLogin: ");
         String msg = "[LOGIN]:[" + account + ", " + password + "]";
         serverManager.sendMessage(msg);
     }

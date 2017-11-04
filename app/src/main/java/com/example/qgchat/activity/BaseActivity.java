@@ -29,6 +29,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +42,6 @@ public class BaseActivity extends AppCompatActivity {
     public ServerManager serverManager = ServerManager.getServerManager();
     private static PermissionListener permissionListener;
     private ProgressDialog dialog;
-    public static String account = null;
-    public String password = null;
 
 
     @Override
@@ -118,51 +117,11 @@ public class BaseActivity extends AppCompatActivity {
         dialog.dismiss();
     }
 
-    public void autoLogin() {
-        if (serverManager.getAccount() == null) {
-            //如果线程没有start过，进行start
-            if (serverManager.getState()== Thread.State.NEW) {
-                serverManager.start();
-            }
-            //如果socket没有连接，使用Thread的run方法再次启动
-            if (serverManager.socket==null || serverManager.socket.isClosed()) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        serverManager.run();
-                    }
-                }).start();
-            }
-            SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
-            account = preferences.getString("account", "");
-            password = preferences.getString("password", "");
-            ParaseData.requestLogin(account, password);
-        }
-    }
-
-    /**
-     * @param login 登录结果的返回
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(LoginEvent login) {
-        if (login.isLogin()) {
-            serverManager.setAccount(account);
-            setToast("网络已连接");
-        } else {
-            goLogin();
-        }
-    }
 
     public void setToast(String value){
         Toast.makeText(this,value,Toast.LENGTH_SHORT).show();
     }
 
-    private void goLogin() {
-        Intent intent = new Intent(ActivityCollector.getTopActivity(), AtyLogin.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
 
     @Override
     public void onStart() {
@@ -179,7 +138,6 @@ public class BaseActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(NetworkChangeReceiver.NetWorkChange change) {
         if (change.getNetworkState() != AccessNetwork.INTERNET_NONE) {
-            autoLogin();
         }
     }
 
