@@ -31,58 +31,12 @@ class ReceiveChatMsg {
                     dealAckChatMsg(msg);
                     break;
                 }
-                case "GETDRESSUP": {
-                    //dealGetDressUp(msg);
-                    break;
-                }
-                case "PROFILE": {
-                    //dealProfile(msg);
-                    break;
-                }
-                case "GETPROFILE": {
-                    //dealGetProfile(msg);
-                    break;
-                }
-                case "GETFRIENDLIST": {
-                    //dealGetFriendList(msg);
-                    break;
-                }
-                case "GETGROUPLIST": {
-                    //dealGetGroupList(msg);
-                    break;
-                }
-                case "GETFRIENDPROFILE": {
-                    //dealGetFriendProfile(msg);
-                    break;
-                }
-                case "STATE": {
-                    //dealState(msg);
-                    break;
-                }
+
                 case "RECEIVECHATMSG": {
                     dealChatMsg(msg);
                     break;
                 }
-                case "USERLIST": {
-                    //dealUserList(msg);
-                    break;
-                }
-                case "ADDFRIEND": {
-                    //dealAddFriend(msg);
-                    break;
-                }
-                case "GROUPMEMBERLIST": {
-                    //dealGroupMemberList(msg);
-                    break;
-                }
-                case "ADDGROUP": {
-                    //dealAddGroup(msg);
-                    break;
-                }
-                case "GETALLGROUPLIST": {
-                    //dealGetAllGroupList(msg);
-                    break;
-                }
+
                 case "ACK_SEARCH_FRIEND":{
                     dealSearchFriend(msg);
                     break;

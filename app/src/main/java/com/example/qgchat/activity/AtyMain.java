@@ -55,6 +55,7 @@ import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
+import com.mob.MobSDK;
 
 import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
@@ -67,6 +68,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.sharesdk.onekeyshare.OnekeyShare;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -112,13 +114,14 @@ public class AtyMain extends BaseActivity {
     private Intent serviceIntent;
     private QGService.QGBinder mBinder = null;
     private DrawerAdapter drawerAdapter;
+    //侧滑菜单菜单项
     private List<DrawerList> drawerList = Arrays.asList(
             new DrawerList(R.drawable.ic_search_black_24dp, R.string.drawer_menu_search),
             new DrawerList(R.drawable.ic_settings_black_24dp, R.string.drawer_menu_setting),
             new DrawerList(R.drawable.ic_menu_share, R.string.drawer_menu_share),
             new DrawerList(R.drawable.ic_menu_camera, R.string.drawer_menu_camera),
             new DrawerList(R.drawable.ic_menu_gallery, R.string.drawer_menu_gallery),
-            new DrawerList(R.drawable.ic_exit_black_24dp,R.string.exit_login)
+            new DrawerList(R.drawable.ic_exit_black_24dp, R.string.exit_login)
     );
 
     //BottomNavigationView的监听事件
@@ -144,6 +147,7 @@ public class AtyMain extends BaseActivity {
 
     };
 
+    //绑定服务
     private ServiceConnection connection = new ServiceConnection() {
 
         @Override
@@ -167,6 +171,8 @@ public class AtyMain extends BaseActivity {
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBarForDrawer(ContextCompat.getColor(this, R.color.colorPrimary));
         ButterKnife.bind(this);
+        //shareSDK初始化
+        MobSDK.init(this, "22971d59d2102", "695d328d1359fe91132c5c4c6ae96277");
         //声明LocationClient类
         mLocationClient = new LocationClient(getApplicationContext());
         //注册监听函数
@@ -178,6 +184,7 @@ public class AtyMain extends BaseActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         titleText.setText("消息");
 
+        //开启绑定服务
         serviceIntent = new Intent(this, QGService.class);
         startService(serviceIntent);
         bindService(serviceIntent, connection, BIND_AUTO_CREATE);
@@ -190,7 +197,7 @@ public class AtyMain extends BaseActivity {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 findViewById(R.id.content).setTranslationX(slideOffset * drawerView.getWidth());
-                if (slideOffset==1) {
+                if (slideOffset == 1) {
                     loadWeather();
                 }
             }
@@ -215,6 +222,9 @@ public class AtyMain extends BaseActivity {
     }
 
 
+    /**
+     * 初始化百度地图
+     */
     private void initLocation() {
         LocationClientOption option = new LocationClientOption();
         //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
@@ -226,6 +236,9 @@ public class AtyMain extends BaseActivity {
         mLocationClient.setLocOption(option);
     }
 
+    /**
+     * 百度地图定位监听
+     */
     public class MyLocationListener extends BDAbstractLocationListener {
 
         @Override
@@ -236,6 +249,9 @@ public class AtyMain extends BaseActivity {
 
     }
 
+    /**
+     * 加载天气信息
+     */
     private void loadWeather() {
         if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE && lat != 0 && lon != 0) {
             String url = HttpUtil.getWeatherURL.replace("CITY", lon + "," + lat);
@@ -248,8 +264,8 @@ public class AtyMain extends BaseActivity {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String result = response.body().string();
-                    Weather weather=BeanUtil.handleWeatherResponse(result);
-                    DBUtil.saveWeather(serverManager.getAccount(),weather);
+                    Weather weather = BeanUtil.handleWeatherResponse(result);
+                    DBUtil.saveWeather(serverManager.getAccount(), weather);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -268,8 +284,8 @@ public class AtyMain extends BaseActivity {
         if (weather != null) {
             weatherArea.setText(weather.getCity());
             weatherState.setText(weather.getTxt());
-            weatherTemp.setText(weather.getTmp()+"°");
-            weatherQuality.setText(weather.getDir()+weather.getSc());
+            weatherTemp.setText(weather.getTmp() + "°");
+            weatherQuality.setText(weather.getDir() + weather.getSc());
         }
     }
 
@@ -294,7 +310,7 @@ public class AtyMain extends BaseActivity {
                             public void run() {
                                 UserBean bean = BeanUtil.handleUserBeanResponse(result);
                                 DBUtil.saveUser(bean);
-                                setDrawerHander(bean.getIconURL(),bean.getUsername());
+                                setDrawerHander(bean.getIconURL(), bean.getUsername());
                             }
                         });
                     }
@@ -303,7 +319,7 @@ public class AtyMain extends BaseActivity {
             });
         } else {
             DBUser bean = DataSupport.findFirst(DBUser.class);
-            setDrawerHander(bean.getIconURL(),bean.getUsername());
+            setDrawerHander(bean.getIconURL(), bean.getUsername());
         }
 
         drawerAdapter = new DrawerAdapter(drawerList);
@@ -323,9 +339,41 @@ public class AtyMain extends BaseActivity {
                         deleteDataBase();
                         restartApplication();
                         break;
+                    case R.string.drawer_menu_share:
+                        showShare();
+                        break;
                 }
             }
         });
+    }
+
+    /**
+     *分享
+     */
+    private void showShare() {
+        OnekeyShare oks = new OnekeyShare();
+//关闭sso授权
+        oks.disableSSOWhenAuthorize();
+
+// title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间等使用
+        oks.setTitle("标题");
+// titleUrl是标题的网络链接，QQ和QQ空间等使用
+        oks.setTitleUrl("http://sharesdk.cn");
+// text是分享文本，所有平台都需要这个字段
+        oks.setText("我是分享文本");
+// imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+//oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
+// url仅在微信（包括好友和朋友圈）中使用
+        oks.setUrl("http://sharesdk.cn");
+// comment是我对这条分享的评论，仅在人人网和QQ空间使用
+        oks.setComment("我是测试评论文本");
+// site是分享此内容的网站名称，仅在QQ空间使用
+        oks.setSite(getString(R.string.app_name));
+// siteUrl是分享此内容的网站地址，仅在QQ空间使用
+        oks.setSiteUrl("http://sharesdk.cn");
+
+// 启动分享GUI
+        oks.show(this);
     }
 
     private void deleteDataBase() {
@@ -347,13 +395,21 @@ public class AtyMain extends BaseActivity {
         editor.apply();
     }
 
+    /**
+     * 重启应用
+     */
     private void restartApplication() {
         final Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
-    private void setDrawerHander(String icon,String title) {
+    /**
+     * @param icon
+     * @param title
+     * 设置DrawerLayout的图形和文字
+     */
+    private void setDrawerHander(String icon, String title) {
         Glide.with(AtyMain.this).load(icon).into(sdvIcon);
         tvLogin.setText(title);
     }

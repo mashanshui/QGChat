@@ -140,5 +140,4 @@ public class BaseActivity extends AppCompatActivity {
         if (change.getNetworkState() != AccessNetwork.INTERNET_NONE) {
         }
     }
-
 }

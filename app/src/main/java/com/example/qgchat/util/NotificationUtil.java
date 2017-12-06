@@ -23,6 +23,14 @@ import static android.content.Context.KEYGUARD_SERVICE;
  */
 
 public class NotificationUtil {
+
+    /**
+     * @param context
+     * @param title
+     * @param content
+     * @param intent
+     * 显示弹框提醒消息(类似qq)
+     */
     public static void setChatMsgNotification(Context context,String title,String content,Intent intent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -47,6 +55,10 @@ public class NotificationUtil {
 //                .setLights(Color.GREEN,1000,1000)  //led灯
     }
 
+    /**
+     * @param context
+     * @return 是否处于后台
+     */
     public static boolean isBackground(Context context) {
         ActivityManager activityManager = (ActivityManager) context
                 .getSystemService(Context.ACTIVITY_SERVICE);
@@ -55,7 +67,7 @@ public class NotificationUtil {
                 .getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
             if (TextUtils.equals(appProcess.processName, context.getPackageName())) {
-                Log.i("info", "isBackground: "+appProcess.importance);
+//                Log.i("info", "isBackground: "+appProcess.importance);
                 boolean isBackground = (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND || appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE);
                 boolean isLockedState = keyguardManager.inKeyguardRestrictedInputMode();
                 return isBackground || isLockedState;

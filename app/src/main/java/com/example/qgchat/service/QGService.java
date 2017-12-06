@@ -72,9 +72,7 @@ public class QGService extends Service {
         SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
         /** 是否登陆过，也就是是否有缓存的帐号密码 */
         boolean logined = preferences.getBoolean("login", false);
-//        Log.i("info", "onMessageEvent: 登陆"+logined);
         if (login.isLogin() && logined) {
-//            Log.i("info", "onMessageEvent: 登陆完成");
             account = preferences.getString("account", "");
             serverManager.setAccount(account);
         } else {
