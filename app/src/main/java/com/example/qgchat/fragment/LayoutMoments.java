@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.security.KeyRep;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,7 +79,7 @@ public class LayoutMoments extends Fragment {
 
         @Override
         public boolean onLongClick(View v) {
-            new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
+            //new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
             int ret = mIat.startListening(mRecognizerListener);
             if (ret != ErrorCode.SUCCESS) {
                 Log.i(TAG, "onLongClick: 识别失败");
@@ -133,7 +134,7 @@ public class LayoutMoments extends Fragment {
 
         @Override
         public void onVolumeChanged(int volume, byte[] data) {
-            Log.i(TAG, "onBeginOfSpeech: "+"当前正在说话，音量大小：" + volume);
+            //Log.i(TAG, "onBeginOfSpeech: "+"当前正在说话，音量大小：" + volume);
         }
 
         @Override
@@ -148,22 +149,9 @@ public class LayoutMoments extends Fragment {
     };
 
     private String printResult(RecognizerResult results) {
-        String text = parseIatResult(results.getResultString());
-        String sn = null;
-        // 读取json结果中的sn字段
-        try {
-            JSONObject resultJson = new JSONObject(results.getResultString());
-            sn = resultJson.optString("sn");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return sn;
-    }
-
-    public String parseIatResult(String json) {
         StringBuffer ret = new StringBuffer();
         try {
-            JSONTokener tokener = new JSONTokener(json);
+            JSONTokener tokener = new JSONTokener(results.getResultString());
             JSONObject joResult = new JSONObject(tokener);
 
             JSONArray words = joResult.getJSONArray("ws");
