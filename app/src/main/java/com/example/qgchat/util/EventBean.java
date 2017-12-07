@@ -1,5 +1,9 @@
 package com.example.qgchat.util;
 
+import com.example.qgchat.bean.ShowMusicItem;
+
+import java.util.List;
+
 /**
  * Created by Administrator on 2017/9/15.
  */
@@ -53,4 +57,45 @@ public class EventBean {
         }
     }
 
+    public static class MusicListMessage{
+        private List<ShowMusicItem> showMusicItems;
+
+        public List<ShowMusicItem> getShowMusicItems() {
+            return showMusicItems;
+        }
+
+        public void setShowMusicItems(List<ShowMusicItem> showMusicItems) {
+            this.showMusicItems = showMusicItems;
+        }
+
+        public MusicListMessage(List<ShowMusicItem> showMusicItems) {
+            this.showMusicItems = showMusicItems;
+        }
+    }
+
+    public static class MusicUrl{
+        private String musicUrl;
+        private String imageUrl;
+
+        public MusicUrl(String musicUrl, String imageUrl) {
+            this.musicUrl = musicUrl;
+            this.imageUrl = imageUrl;
+        }
+
+        public String getMusicUrl() {
+            return musicUrl;
+        }
+
+        public void setMusicUrl(String musicUrl) {
+            this.musicUrl = musicUrl;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+    }
 }
