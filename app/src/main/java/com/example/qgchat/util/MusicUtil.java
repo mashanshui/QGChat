@@ -1,7 +1,5 @@
 package com.example.qgchat.util;
 
-import android.os.Message;
-
 import com.example.qgchat.bean.ShowMusicItem;
 
 import org.greenrobot.eventbus.EventBus;

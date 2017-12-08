@@ -130,7 +130,8 @@ public class LayoutMoments extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(EventBean.MusicListMessage listMessage) {
-        showMusicItems = listMessage.getShowMusicItems();
+        showMusicItems.clear();
+        showMusicItems.addAll(listMessage.getShowMusicItems());
         adapter.notifyDataSetChanged();
     }
 
@@ -162,7 +163,8 @@ public class LayoutMoments extends Fragment {
         public void onResult(RecognizerResult results, boolean isLast) {
             Log.i(TAG, results.getResultString());
             String keyword=printResult(results);
-            if (keyword!=null) {
+            if (!keyword.equals("。")) {
+                Log.i(TAG, "onResult: " + keyword);
                 MusicUtil.getShowMusic(keyword);
             }
         }

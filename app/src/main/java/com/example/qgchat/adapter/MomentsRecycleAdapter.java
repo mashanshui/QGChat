@@ -27,8 +27,5 @@ public class MomentsRecycleAdapter extends BaseQuickAdapter<ShowMusicItem,BaseVi
         helper.setText(R.id.musicName, item.getSongname())
                 .setText(R.id.musicArtist, item.getSingername())
                 .setText(R.id.musicTime, item.getDuration());
-//        if (item.iconURL != null && !item.iconURL.equals("")) {
-//            Glide.with(mContext).load(item.iconURL).into((ImageView) helper.getView(R.id.user_headImage));
-//        }
     }
 }
