@@ -28,7 +28,7 @@ public class MusicUtil {
      * @param keyword
      * 当用户查询的时候加载显示的信息
      */
-    private void getShowMusic(final String keyword) {
+    private static void getShowMusic(final String keyword) {
         String u = null;
         try {
             u = new String(keyword.getBytes(), "utf-8");
@@ -52,7 +52,7 @@ public class MusicUtil {
         });
     }
 
-    private List<ShowMusicItem> parseShowJSON(String response) {
+    private static List<ShowMusicItem> parseShowJSON(String response) {
         List<ShowMusicItem> musicItems = new ArrayList<>();
         try {
             response=response.replace("<!--KG_TAG_RES_START-->","");
@@ -93,7 +93,7 @@ public class MusicUtil {
      * 当用户点击歌曲的时候进行播放
      * 也就是获取歌曲的链接
      */
-    private void getplayMusic(final String hash) {
+    private static  void getplayMusic(final String hash) {
 
         String url="http://m.kugou.com/app/i/getSongInfo.php?hash=" + hash + "&cmd=playInfo";
         HttpUtil.sendOkHttpRequest(url, new Callback() {
@@ -111,7 +111,7 @@ public class MusicUtil {
     }
 
 
-    private String[] parsePlayJSON(String response) {
+    private static String[] parsePlayJSON(String response) {
         String musicUrl=null;
         String imageUrl=null;
         try {
