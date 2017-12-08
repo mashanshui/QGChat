@@ -18,7 +18,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Administrator on 2017/12/6.
  */
 
-public class VoiceButton extends CircleImageView implements View.OnClickListener{
+public class VoiceButton extends CircleImageView{
     private boolean isAnimation=false;
 
     public VoiceButton(Context context) {
@@ -37,7 +37,6 @@ public class VoiceButton extends CircleImageView implements View.OnClickListener
 
     private void initView() {
         this.bringToFront();
-        this.setOnClickListener(this);
     }
 
     @Override
@@ -49,17 +48,15 @@ public class VoiceButton extends CircleImageView implements View.OnClickListener
                 break;
             case MotionEvent.ACTION_UP:
                 setImageResource(R.mipmap.voice_empty);
+                if (isAnimation) {
+                    returnAnimation();
+                } else {
+                    startAnimation();
+                }
                 Log.i("info", "onTouchEvent: up");
                 break;
         }
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (isAnimation) {
-            returnAnimation();
-        }
     }
 
     private void returnAnimation() {
@@ -71,7 +68,7 @@ public class VoiceButton extends CircleImageView implements View.OnClickListener
         ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,0);
         final AnimatorSet animSet = new AnimatorSet();
         animSet.play(animator1).with(animator2).with(animator3).with(animator4);
-        animSet.setDuration(2000);
+        animSet.setDuration(1000);
         animSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -90,7 +87,7 @@ public class VoiceButton extends CircleImageView implements View.OnClickListener
         ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,400f);
         final AnimatorSet animSet = new AnimatorSet();
         animSet.play(animator1).with(animator2).with(animator3).with(animator4);
-        animSet.setDuration(2000);
+        animSet.setDuration(1000);
         animSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {

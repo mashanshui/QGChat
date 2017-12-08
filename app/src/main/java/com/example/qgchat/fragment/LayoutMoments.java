@@ -131,6 +131,7 @@ public class LayoutMoments extends Fragment {
         public void onResult(RecognizerResult results, boolean isLast) {
             Log.i(TAG, results.getResultString());
             String keyword=printResult(results);
+            MusicUtil.getShowMusic(keyword);
         }
 
         @Override
@@ -190,5 +191,10 @@ public class LayoutMoments extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        if( null != mIat ){
+            // 退出时释放连接
+            mIat.cancel();
+            mIat.destroy();
+        }
     }
 }
