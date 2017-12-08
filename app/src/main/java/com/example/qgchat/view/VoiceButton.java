@@ -19,6 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class VoiceButton extends CircleImageView{
+    private static final String TAG = "info";
     private boolean isAnimation=false;
 
     public VoiceButton(Context context) {
@@ -68,7 +69,7 @@ public class VoiceButton extends CircleImageView{
         ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,0);
         final AnimatorSet animSet = new AnimatorSet();
         animSet.play(animator1).with(animator2).with(animator3).with(animator4);
-        animSet.setDuration(1000);
+        animSet.setDuration(600);
         animSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -83,11 +84,15 @@ public class VoiceButton extends CircleImageView{
         ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, "scaleX", 1f,0.5f);
         float curTranslationX = this.getTranslationX();
         float curTranslationY = this.getTranslationY();
-        ObjectAnimator animator3=ObjectAnimator.ofFloat(this,"translationX",curTranslationX,300f);
-        ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,400f);
+        float Y = getBottom()-dip2px(getContext(),120);
+        float X = getRight()-dip2px(getContext(),120);
+        Log.i(TAG, "startAnimation: "+X);
+        Log.i(TAG, "startAnimation: "+Y);
+        ObjectAnimator animator3=ObjectAnimator.ofFloat(this,"translationX",curTranslationX,X);
+        ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,Y);
         final AnimatorSet animSet = new AnimatorSet();
         animSet.play(animator1).with(animator2).with(animator3).with(animator4);
-        animSet.setDuration(1000);
+        animSet.setDuration(800);
         animSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -95,5 +100,14 @@ public class VoiceButton extends CircleImageView{
             }
         });
         animSet.start();
+    }
+
+    /**
+     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     */
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        Log.i(TAG, "dip2px: "+scale);
+        return (int) (dpValue * scale + 0.5f);
     }
 }

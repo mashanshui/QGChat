@@ -1,14 +1,18 @@
 package com.example.qgchat.util;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Vibrator;
+import android.util.Log;
 
 import com.example.qgchat.R;
+
+import java.io.IOException;
 
 /**
  * Created by Administrator on 2017/12/7.
@@ -18,12 +22,16 @@ public class VoiceUtil {
     private SoundPool pool;
     private Context context;
     private int sourceid;
+    private AssetFileDescriptor afd = null;
 
     public VoiceUtil(Context context) {
         this.context = context;
         pool = new SoundPool(10, AudioManager.STREAM_SYSTEM, 5);
-        //载入音频流，返回在池中的id
-        sourceid = pool.load(context, R.raw.hint,0);
+        try {
+            afd = context.getAssets().openFd("hint.wav");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean isSlient(){
@@ -56,9 +64,17 @@ public class VoiceUtil {
 
     public void playBeepSoundAndVibrate() {
         startVibrate();
-        if (!isSlient()) {
-            //播放音频，第二个参数为左声道音量;第三个参数为右声道音量;第四个参数为优先级；第五个参数为循环次数，0不循环，-1循环;第六个参数为速率，速率    最低0.5最高为2，1代表正常速度
-            pool.play(sourceid, 1, 1, 0, 0, 1);
-        }
+        //载入音频流，返回在池中的id
+        sourceid = pool.load(afd,0);
+        pool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                if (!isSlient()) {
+                    //播放音频，第二个参数为左声道音量;第三个参数为右声道音量;第四个参数为优先级；
+                    // 第五个参数为循环次数，0不循环，-1循环;第六个参数为速率，速率最低0.5最高为2，1代表正常速度
+                }
+                pool.play(sourceid, 1, 1, 0, 0, 1);
+            }
+        });
     }
 }

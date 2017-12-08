@@ -1,7 +1,12 @@
 package com.example.qgchat.fragment;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,12 +14,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.qgchat.R;
+import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.adapter.MomentsRecycleAdapter;
 import com.example.qgchat.bean.ShowMusicItem;
 import com.example.qgchat.bean.UserMoments;
 import com.example.qgchat.broadcast.NetworkChangeReceiver;
+import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.GridItemDecoration;
@@ -64,6 +72,34 @@ public class LayoutMoments extends Fragment {
         // Required empty public constructor
     }
 
+    private Handler handler=new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            int ret = mIat.startListening(mRecognizerListener);
+            if (ret != ErrorCode.SUCCESS) {
+                Log.i(TAG, "onLongClick: 识别失败");
+            } else {
+                Log.i(TAG, "onLongClick: 开始说话");
+            }
+        }
+    };
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            BaseActivity.requestRuntimePermissions(new String[]{Manifest.permission.RECORD_AUDIO}, new PermissionListener() {
+                @Override
+                public void onGranted() {
+                }
+
+                @Override
+                public void onDenied(List<String> deniedPermission) {
+                    Toast.makeText(getContext(),"不能使用语音搜歌功能",Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,13 +116,8 @@ public class LayoutMoments extends Fragment {
 
         @Override
         public boolean onLongClick(View v) {
-            //new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
-            int ret = mIat.startListening(mRecognizerListener);
-            if (ret != ErrorCode.SUCCESS) {
-                Log.i(TAG, "onLongClick: 识别失败");
-            } else {
-                Log.i(TAG, "onLongClick: 开始说话");
-            }
+            new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
+            handler.sendEmptyMessageDelayed(1,1500);
             return false;
         }
     }
@@ -131,7 +162,9 @@ public class LayoutMoments extends Fragment {
         public void onResult(RecognizerResult results, boolean isLast) {
             Log.i(TAG, results.getResultString());
             String keyword=printResult(results);
-            MusicUtil.getShowMusic(keyword);
+            if (keyword!=null) {
+                MusicUtil.getShowMusic(keyword);
+            }
         }
 
         @Override
