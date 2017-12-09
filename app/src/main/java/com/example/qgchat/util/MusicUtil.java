@@ -49,7 +49,7 @@ public class MusicUtil {
         });
     }
 
-    private static List<ShowMusicItem> parseShowJSON(String response) {
+    public static List<ShowMusicItem> parseShowJSON(String response) {
         List<ShowMusicItem> musicItems = new ArrayList<>();
         try {
             response = response.replace("<!--KG_TAG_RES_START-->", "");
@@ -107,7 +107,7 @@ public class MusicUtil {
     }
 
 
-    private static String[] parsePlayJSON(String response) {
+    public static String[] parsePlayJSON(String response) {
         String musicUrl = null;
         String imageUrl = null;
         try {

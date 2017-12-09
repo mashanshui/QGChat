@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.qgchat.R;
 import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.adapter.MomentsRecycleAdapter;
@@ -52,11 +54,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LayoutMoments extends Fragment {
+public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemClickListener,BaseQuickAdapter.OnItemChildClickListener{
     @BindView(R.id.momentsRecycleView)
     RecyclerView momentsRecycleView;
     Unbinder unbinder;
@@ -67,6 +70,7 @@ public class LayoutMoments extends Fragment {
     private MomentsRecycleAdapter adapter;
     private static final String TAG = "info";
     private SpeechRecognizer mIat;
+    private boolean playing;
 
     public LayoutMoments() {
         // Required empty public constructor
@@ -122,10 +126,52 @@ public class LayoutMoments extends Fragment {
         }
     }
     private void initAdapter() {
+        loadData();
         adapter = new MomentsRecycleAdapter(showMusicItems);
+        adapter.setOnItemClickListener(this);
+        adapter.setOnItemChildClickListener(this);
         momentsRecycleView.setAdapter(adapter);
+        momentsRecycleView.setItemAnimator(new DefaultItemAnimator());
         momentsRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
         momentsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(),R.drawable.recycleview_divider));
+    }
+
+    private void loadData() {
+        ShowMusicItem showItem = new ShowMusicItem();
+        showItem.setSongname("asdad");
+        showItem.setSingername("sadasd");
+        showItem.setDuration("10000");
+        showItem.setHash("sadd");
+        showMusicItems.add(showItem);
+    }
+
+    @Override
+    public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+        ShowMusicItem showItem=showMusicItems.get(position);
+        showItem.setPlayState(ShowMusicItem.PLAY);
+        showMusicItems.set(position, showItem);
+        adapter.notifyItemChanged(position);
+        playing = true;
+        MusicUtil.getplayMusic(showItem.getHash());
+    }
+
+
+    @Override
+    public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+        switch (view.getId()) {
+            case R.id.music_control:
+                CircleImageView imageView = (CircleImageView) view;
+                if (playing) {
+                    imageView.setImageResource(R.drawable.ic_pause);
+                    playing = false;
+                    EventBus.getDefault().post(new EventBean.Playing(false));
+                } else {
+                    imageView.setImageResource(R.drawable.ic_play);
+                    playing = true;
+                    EventBus.getDefault().post(new EventBean.Playing(true));
+                }
+                break;
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

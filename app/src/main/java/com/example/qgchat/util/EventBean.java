@@ -98,4 +98,20 @@ public class EventBean {
             this.imageUrl = imageUrl;
         }
     }
+
+    public static class Playing{
+        private boolean playing;
+
+        public boolean isPlaying() {
+            return playing;
+        }
+
+        public void setPlaying(boolean playing) {
+            this.playing = playing;
+        }
+
+        public Playing(boolean playing) {
+            this.playing = playing;
+        }
+    }
 }

@@ -5,10 +5,21 @@ package com.example.qgchat.bean;
  */
 
 public class ShowMusicItem {
+    public static final int PLAY = 1;
+    public static final int STOP = 2;
+    private int playState=STOP;
     private String songname;
     private String singername;
     private String duration;
     private String hash;
+
+    public int getPlayState() {
+        return playState;
+    }
+
+    public void setPlayState(int playState) {
+        this.playState = playState;
+    }
 
     public String getSongname() {
         return songname;
