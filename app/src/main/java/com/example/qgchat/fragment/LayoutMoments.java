@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -71,6 +72,8 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
     private static final String TAG = "info";
     private SpeechRecognizer mIat;
     private boolean playing;
+    private CircleImageView playStateView;
+    private int oldPosition=-1;
 
     public LayoutMoments() {
         // Required empty public constructor
@@ -120,13 +123,13 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
 
         @Override
         public boolean onLongClick(View v) {
+            EventBus.getDefault().post(new EventBean.Playing(false));
             new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
             handler.sendEmptyMessageDelayed(1,1500);
             return false;
         }
     }
     private void initAdapter() {
-        loadData();
         adapter = new MomentsRecycleAdapter(showMusicItems);
         adapter.setOnItemClickListener(this);
         adapter.setOnItemChildClickListener(this);
@@ -136,23 +139,22 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
         momentsRecycleView.addItemDecoration(new GridItemDecoration(getActivity(),R.drawable.recycleview_divider));
     }
 
-    private void loadData() {
-        ShowMusicItem showItem = new ShowMusicItem();
-        showItem.setSongname("asdad");
-        showItem.setSingername("sadasd");
-        showItem.setDuration("10000");
-        showItem.setHash("sadd");
-        showMusicItems.add(showItem);
-    }
-
     @Override
     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+        if (oldPosition!=-1) {
+            modifyPlayState(oldPosition,ShowMusicItem.STOP);
+        }
+        oldPosition = position;
+        modifyPlayState(position,ShowMusicItem.PLAY);
+        playing = true;
+        MusicUtil.getplayMusic(showMusicItems.get(position).getHash());
+    }
+
+    private void modifyPlayState(int position,int playState) {
         ShowMusicItem showItem=showMusicItems.get(position);
-        showItem.setPlayState(ShowMusicItem.PLAY);
+        showItem.setPlayState(playState);
         showMusicItems.set(position, showItem);
         adapter.notifyItemChanged(position);
-        playing = true;
-        MusicUtil.getplayMusic(showItem.getHash());
     }
 
 
@@ -160,18 +162,26 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
     public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
         switch (view.getId()) {
             case R.id.music_control:
-                CircleImageView imageView = (CircleImageView) view;
+                playStateView = (CircleImageView) view;
                 if (playing) {
-                    imageView.setImageResource(R.drawable.ic_pause);
-                    playing = false;
-                    EventBus.getDefault().post(new EventBean.Playing(false));
+                    pause();
                 } else {
-                    imageView.setImageResource(R.drawable.ic_play);
-                    playing = true;
-                    EventBus.getDefault().post(new EventBean.Playing(true));
+                    play();
                 }
                 break;
         }
+    }
+
+    private void play() {
+        playStateView.setImageResource(R.drawable.ic_play);
+        playing = true;
+        EventBus.getDefault().post(new EventBean.Playing(true));
+    }
+
+    private void pause() {
+        playStateView.setImageResource(R.drawable.ic_pause);
+        playing = false;
+        EventBus.getDefault().post(new EventBean.Playing(false));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

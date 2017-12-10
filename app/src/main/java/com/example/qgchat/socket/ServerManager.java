@@ -78,7 +78,7 @@ public class ServerManager extends Thread {
     public void run() {
         while (true) {
             try {
-                Log.i("info", "run: reply");
+//                Log.i("info", "run: reply");
                 connect();
                 sendUrgentDataHandler.sendEmptyMessage(1);
                 bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
@@ -111,7 +111,7 @@ public class ServerManager extends Thread {
         socket = null;
         while (socket == null) {
             try {
-                Log.i("info", "run: conn");
+//                Log.i("info", "run: conn");
                 socket = new Socket(IP, 27777);
             } catch (IOException e) {
                 SystemClock.sleep(1000);

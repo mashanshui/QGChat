@@ -118,7 +118,8 @@ public class MusicUtil {
             JSONObject object = new JSONObject(response);
             musicUrl = object.getString("url");
             imageUrl = object.getString("imgUrl");
-            imageUrl = imageUrl.replace("{size}/", "");
+            String imageSize = "100";
+            imageUrl = imageUrl.replace("{size}",imageSize);
             //Log.i("info", musicUrl+"   "+ImageUrl);
         } catch (JSONException e) {
             // TODO Auto-generated catch block

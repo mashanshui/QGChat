@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -16,8 +17,10 @@ import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.MusicUtil;
 
 import java.io.IOException;
+import java.lang.annotation.Target;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -32,7 +35,8 @@ public class MomentsRecycleAdapter extends BaseQuickAdapter<ShowMusicItem,BaseVi
     private Handler handler=new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
-            String imageUrl = msg.toString();
+            String imageUrl = msg.obj.toString();
+            Log.i("info", "handleMessage: "+imageUrl);
             if (imageUrl != null && !imageUrl.equals("")) {
                 Glide.with(mContext).load(imageUrl).into(imageView);
             }
@@ -60,6 +64,8 @@ public class MomentsRecycleAdapter extends BaseQuickAdapter<ShowMusicItem,BaseVi
                         .setText(R.id.musicArtist, item.getSingername())
                         .addOnClickListener(R.id.music_control);
                 imageView=helper.getView(R.id.musicImage);
+                CircleImageView playStateView=helper.getView(R.id.music_control);
+                playStateView.setImageResource(R.drawable.ic_play);
                 getplayMusic(item.getHash());
                 break;
             case ShowMusicItem.STOP:
