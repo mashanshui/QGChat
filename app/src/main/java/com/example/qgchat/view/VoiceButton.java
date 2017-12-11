@@ -45,7 +45,6 @@ public class VoiceButton extends CircleImageView{
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 setImageResource(R.mipmap.voice_full);
-                Log.i("info", "onTouchEvent: down");
                 break;
             case MotionEvent.ACTION_UP:
                 setImageResource(R.mipmap.voice_empty);
@@ -54,7 +53,6 @@ public class VoiceButton extends CircleImageView{
                 } else {
                     startAnimation();
                 }
-                Log.i("info", "onTouchEvent: up");
                 break;
         }
         return super.onTouchEvent(event);
@@ -86,8 +84,6 @@ public class VoiceButton extends CircleImageView{
         float curTranslationY = this.getTranslationY();
         float Y = getBottom()-dip2px(getContext(),120);
         float X = getRight()-dip2px(getContext(),120);
-        Log.i(TAG, "startAnimation: "+X);
-        Log.i(TAG, "startAnimation: "+Y);
         ObjectAnimator animator3=ObjectAnimator.ofFloat(this,"translationX",curTranslationX,X);
         ObjectAnimator animator4=ObjectAnimator.ofFloat(this,"translationY",curTranslationY,Y);
         final AnimatorSet animSet = new AnimatorSet();
@@ -107,7 +103,6 @@ public class VoiceButton extends CircleImageView{
      */
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        Log.i(TAG, "dip2px: "+scale);
         return (int) (dpValue * scale + 0.5f);
     }
 }

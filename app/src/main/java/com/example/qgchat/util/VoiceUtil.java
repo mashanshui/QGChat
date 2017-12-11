@@ -37,7 +37,7 @@ public class VoiceUtil {
     private boolean isSlient(){
         AudioManager audioService = (AudioManager) context
                 .getSystemService(Context.AUDIO_SERVICE);
-        if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
+        if (audioService.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
             return false;
         }
         return true;
