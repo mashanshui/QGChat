@@ -63,7 +63,6 @@ public class VoiceUtil {
     }
 
     public void playBeepSoundAndVibrate() {
-        startVibrate();
         //载入音频流，返回在池中的id
         sourceid = pool.load(afd,0);
         pool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
@@ -72,8 +71,9 @@ public class VoiceUtil {
                 if (!isSlient()) {
                     //播放音频，第二个参数为左声道音量;第三个参数为右声道音量;第四个参数为优先级；
                     // 第五个参数为循环次数，0不循环，-1循环;第六个参数为速率，速率最低0.5最高为2，1代表正常速度
+                    pool.play(sourceid, 1, 1, 0, 0, 1);
                 }
-                pool.play(sourceid, 1, 1, 0, 0, 1);
+                startVibrate();
             }
         });
     }

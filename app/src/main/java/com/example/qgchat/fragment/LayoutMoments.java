@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -115,8 +116,26 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
         unbinder = ButterKnife.bind(this, rootView);
         mIat = SpeechRecognizer.createRecognizer(getActivity(), null);
         voiceButton.setOnLongClickListener(new MyLongClickListener());
+        voiceButton.setOnTouchListener(new MyTouchListener());
         initAdapter();
         return rootView;
+    }
+
+    private class MyTouchListener implements View.OnTouchListener {
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (mIat.isListening()) {
+                        mIat.stopListening();
+                    }
+                    break;
+            }
+            return false;
+        }
     }
 
     private class MyLongClickListener implements View.OnLongClickListener {
@@ -125,10 +144,11 @@ public class LayoutMoments extends Fragment implements BaseQuickAdapter.OnItemCl
         public boolean onLongClick(View v) {
             EventBus.getDefault().post(new EventBean.Playing(false));
             new VoiceUtil(getActivity()).playBeepSoundAndVibrate();
-            handler.sendEmptyMessageDelayed(1,1500);
+            handler.sendEmptyMessageDelayed(1,1000);
             return false;
         }
     }
+
     private void initAdapter() {
         adapter = new MomentsRecycleAdapter(showMusicItems);
         adapter.setOnItemClickListener(this);
