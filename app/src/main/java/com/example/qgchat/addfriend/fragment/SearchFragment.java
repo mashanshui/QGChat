@@ -15,6 +15,8 @@ import com.example.qgchat.socket.ParaseData;
 import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.StringUtil;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.greenrobot.eventbus.EventBus;
@@ -53,7 +55,12 @@ public class SearchFragment extends Fragment {
                 String account = edt_number.getText().toString();
                 if (!StringUtil.isEmpty(account)) {
                     ((AtyAddFriend) getActivity()).showBufferDialog();
-                    ParaseData.sendSearchFriend(account);
+                    //参数为要添加的好友的username和添加理由
+                    try {
+                        EMClient.getInstance().contactManager().addContact(account, "");
+                    } catch (HyphenateException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     Toast.makeText(getActivity(), "请输入完整", Toast.LENGTH_SHORT).show();
                 }
@@ -62,27 +69,15 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(EventBean.SerachFriendEvent serachFriendEvent) {
-        ((AtyAddFriend) getActivity()).dismissBufferDialog();
-        if (serachFriendEvent.isExist()) {
-            EventBus.getDefault().post(new Search(true,edt_number.getText().toString()));
-        } else {
-            Toast.makeText(getActivity(), "用户不存在", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onMessage(EventBean.SerachFriendEvent serachFriendEvent) {
+//        ((AtyAddFriend) getActivity()).dismissBufferDialog();
+//        if (serachFriendEvent.isExist()) {
+//            EventBus.getDefault().post(new Search(true,edt_number.getText().toString()));
+//        } else {
+//            Toast.makeText(getActivity(), "用户不存在", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     public class Search{
         private boolean isSearch;

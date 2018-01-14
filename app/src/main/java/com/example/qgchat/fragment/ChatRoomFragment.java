@@ -6,19 +6,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.qgchat.R;
-import com.hyphenate.easeui.ui.EaseContactListFragment;
+import com.hyphenate.easeui.ui.EaseChatFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LayoutContacts extends EaseContactListFragment {
-    private static final String TAG = "LayoutContacts";
-    private View rootView;
-    private boolean isFirstLoad = true;
+public class ChatRoomFragment extends EaseChatFragment {
 
-    public LayoutContacts() {
+
+    public ChatRoomFragment() {
         // Required empty public constructor
     }
 
@@ -26,7 +25,6 @@ public class LayoutContacts extends EaseContactListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_layout_contacts, container, false);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -36,8 +34,4 @@ public class LayoutContacts extends EaseContactListFragment {
         hideTitleBar();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 }

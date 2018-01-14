@@ -31,7 +31,6 @@ import java.io.IOException;
 
 public class QGService extends Service implements MediaPlayer.OnCompletionListener,MediaPlayer.OnBufferingUpdateListener,MediaPlayer.OnPreparedListener{
     private QGBinder mBinder = new QGBinder();
-    public ServerManager serverManager = ServerManager.getServerManager();
     public static String account = null;
     public String password = null;
     private MediaPlayer mediaPlayer = null;
@@ -82,12 +81,6 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(ServerManager.Connection connection) {
-        if (connection.isConnection()) {
-            autoLogin();
-        }
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(EventBean.MusicUrl musicUrl) {
@@ -122,38 +115,12 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
         }
     }
 
-    /**
-     * @param login 登录结果的返回
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(LoginEvent login) {
-        SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
-        /** 是否登陆过，也就是是否有缓存的帐号密码 */
-        boolean logined = preferences.getBoolean("login", false);
-        if (login.isLogin() && logined) {
-            account = preferences.getString("account", "");
-            serverManager.setAccount(account);
-        } else {
-            goLogin();
-        }
-    }
-
 
     private void goLogin() {
         Intent intent = new Intent(ActivityCollector.getTopActivity(), AtyLogin.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
-
-    public void autoLogin() {
-        SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
-        account = preferences.getString("account", "");
-        password = preferences.getString("password", "");
-        if (!StringUtil.isEmpty(account,password)) {
-//            Log.i("info", "service autoLogin: "+account+password);
-            ParaseData.requestLogin(account, password);
-        }
     }
 
     @Override

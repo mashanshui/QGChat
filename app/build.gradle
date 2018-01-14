@@ -63,4 +63,5 @@ dependencies {
     compile 'com.zhihu.android:matisse:0.5.0-alpha4'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
+    implementation project(':easeui')
 }

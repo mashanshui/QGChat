@@ -2,21 +2,9 @@ package com.example.qgchat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
-import com.example.qgchat.db.DBChatMsg;
-import com.example.qgchat.db.DBUser;
-import com.example.qgchat.db.DBUserGruop;
-import com.example.qgchat.db.DBUserItemMsg;
-import com.example.qgchat.db.DBUserList;
-import com.example.qgchat.util.LogUtil;
-
-import org.litepal.crud.DataSupport;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.example.qgchat.R.id.myMsg;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
@@ -25,6 +13,17 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_welcome);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //注册失败会抛出HyphenateException
+                try {
+                    EMClient.getInstance().createAccount("shanshui2", "123456");//同步方法
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 //        DBUserList dbUserList = new DBUserList();
 //        dbUserList.setUsername("mashanshui");
 //        dbUserList.setIconURL("");
@@ -52,10 +51,10 @@ public class TestActivity extends AppCompatActivity {
 //        for (DBUserList userList : userLists) {
 //            Log.i("info", "onCreate: "+userList.getAccount());
 //        }
-        DBChatMsg msg = new DBChatMsg();
-        msg.setContent("sdf");
-        msg.setMsgType(DBChatMsg.TYPE_SENT);
-        msg.save();
+//        DBChatMsg msg = new DBChatMsg();
+//        msg.setContent("sdf");
+//        msg.setMsgType(DBChatMsg.TYPE_SENT);
+//        msg.save();
 //        List<DBChatMsg> chatMsgs =DataSupport.findAll(DBChatMsg.class);
 //        Log.i("info", "onCreate: "+chatMsgs.get(0).getContent());
 

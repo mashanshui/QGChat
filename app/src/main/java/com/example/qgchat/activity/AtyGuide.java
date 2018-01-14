@@ -36,7 +36,6 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
     private List<View> viewList;
     private Button btnTomain;
     private GuideAdapter adapter;
-    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,6 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aty_guide);
         ButterKnife.bind(this);
-        preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
         initView();
     }
 
@@ -59,13 +57,6 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
 
     private void goLogin() {
         Intent intent = new Intent(AtyGuide.this, AtyLogin.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
-
-    private void goHome() {
-        Intent intent = new Intent(AtyGuide.this, AtyMain.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -100,16 +91,7 @@ public class AtyGuide extends AppCompatActivity implements ViewPager.OnPageChang
         btnTomain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
-                /**
-                 * 是否登陆过，也就是是否有缓存的帐号密码
-                 */
-                boolean login = preferences.getBoolean("login", false);
-                if (login) {
-                    goHome();
-                } else {
-                    goLogin();
-                }
+                goLogin();
             }
         });
     }

@@ -1,12 +1,15 @@
 package com.example.qgchat.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,22 +53,30 @@ import com.example.qgchat.fragment.LayoutContacts;
 import com.example.qgchat.fragment.LayoutMoments;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.service.QGService;
-import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMConversation;
+import com.hyphenate.easeui.EaseConstant;
+import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.ui.EaseBaseActivity;
+import com.hyphenate.easeui.ui.EaseContactListFragment;
+import com.hyphenate.easeui.ui.EaseConversationListFragment;
+import com.hyphenate.exceptions.HyphenateException;
 import com.mob.MobSDK;
 
-import org.greenrobot.eventbus.EventBus;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +86,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.baidu.location.h.k.D;
 import static com.example.qgchat.service.QGService.account;
 
 
@@ -99,7 +110,8 @@ public class AtyMain extends BaseActivity {
     TextView weatherTemp;
     @BindView(R.id.weather_area)
     TextView weatherArea;
-
+    private SharedPreferences preferences;
+    private LayoutContacts layoutContacts;
     public LocationClient mLocationClient = null;
     /**
      * 经度
@@ -153,14 +165,22 @@ public class AtyMain extends BaseActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBinder = (QGService.QGBinder) service;
-            if (serverManager.getAccount() == null) {
-                EventBus.getDefault().post(new ServerManager.Connection(true));
-            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
 
+        }
+    };
+
+    private Map<String, EaseUser> map;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                layoutContacts.setContactsMap(map);
+                layoutContacts.refresh();
+            }
         }
     };
 
@@ -178,6 +198,7 @@ public class AtyMain extends BaseActivity {
         //注册监听函数
         mLocationClient.registerLocationListener(new MyLocationListener());
 
+        preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -203,7 +224,7 @@ public class AtyMain extends BaseActivity {
             }
         });
         toggle.syncState();
-        setDrawerLayout();
+        //setDrawerLayout();
         initViews();
         requestRuntimePermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.READ_PHONE_STATE,
@@ -265,7 +286,8 @@ public class AtyMain extends BaseActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     String result = response.body().string();
                     Weather weather = BeanUtil.handleWeatherResponse(result);
-                    DBUtil.saveWeather(serverManager.getAccount(), weather);
+                    String account = preferences.getString("account", null);
+                    DBUtil.saveWeather(account, weather);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -348,7 +370,7 @@ public class AtyMain extends BaseActivity {
     }
 
     /**
-     *分享
+     * 分享
      */
     private void showShare() {
         OnekeyShare oks = new OnekeyShare();
@@ -406,20 +428,68 @@ public class AtyMain extends BaseActivity {
 
     /**
      * @param icon
-     * @param title
-     * 设置DrawerLayout的图形和文字
+     * @param title 设置DrawerLayout的图形和文字
      */
     private void setDrawerHander(String icon, String title) {
         Glide.with(AtyMain.this).load(icon).into(sdvIcon);
         tvLogin.setText(title);
     }
 
+    /**
+     * 获取联系人
+     *
+     * @return
+     */
+    private Map<String, EaseUser> getContacts() {
+        Map<String, EaseUser> map = new HashMap<>();
+        try {
+            List<String> userNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
+//            KLog.e("......有几个好友:" + userNames.size());
+            for (String userId : userNames) {
+                Log.i(TAG, "getContacts: " + "好友列表中有 : " + userId);
+                map.put(userId, new EaseUser(userId));
+            }
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
     private void initViews() {
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         MainViewPageFragmentAdapter adapter = new MainViewPageFragmentAdapter(getSupportFragmentManager());
-        adapter.addFragment(new LayoutChats());
-        adapter.addFragment(new LayoutContacts());
-        adapter.addFragment(new LayoutMoments());
+
+        //消息页面
+        LayoutChats layoutChats = new LayoutChats();
+        layoutChats.setConversationListItemClickListener(new EaseConversationListFragment.EaseConversationListItemClickListener() {
+            @Override
+            public void onListItemClicked(EMConversation conversation) {
+                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, conversation.conversationId()));
+            }
+        });
+
+        //联系人页面
+        layoutContacts = new LayoutContacts();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                map = getContacts();
+                handler.sendEmptyMessage(1);
+            }
+        }).start();
+        layoutContacts.setContactListItemClickListener(new EaseContactListFragment.EaseContactListItemClickListener() {
+            @Override
+            public void onListItemClicked(EaseUser user) {
+                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, user.getUsername()));
+            }
+        });
+
+        //音乐页面
+        LayoutMoments layoutMoments = new LayoutMoments();
+
+        adapter.addFragment(layoutChats);
+        adapter.addFragment(layoutContacts);
+        adapter.addFragment(layoutMoments);
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -511,6 +581,7 @@ public class AtyMain extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected boolean onPrepareOptionsPanel(View view, Menu menu) {
         if (menu != null) {
