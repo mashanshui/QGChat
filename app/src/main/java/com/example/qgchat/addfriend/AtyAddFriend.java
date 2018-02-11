@@ -8,20 +8,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.qgchat.R;
 import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.addfriend.fragment.SearchFragment;
-import com.example.qgchat.loginAndregister.fragment.RegisterFragment1;
-import com.example.qgchat.loginAndregister.fragment.RegisterFragment2;
 import com.example.qgchat.socket.ParaseData;
 import com.example.qgchat.util.EventBean;
-import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
 
 import org.greenrobot.eventbus.Subscribe;

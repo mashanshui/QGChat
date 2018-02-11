@@ -10,24 +10,11 @@ import android.widget.Toast;
 
 import com.example.qgchat.R;
 import com.example.qgchat.addfriend.AtyAddFriend;
-import com.example.qgchat.loginAndregister.AtyRegister;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.util.EventBean;
-import com.example.qgchat.util.StateButton;
+import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.StringUtil;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 import com.rengwuxian.materialedittext.MaterialEditText;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
-import static android.R.attr.button;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,12 +42,7 @@ public class SearchFragment extends Fragment {
                 String account = edt_number.getText().toString();
                 if (!StringUtil.isEmpty(account)) {
                     ((AtyAddFriend) getActivity()).showBufferDialog();
-                    //参数为要添加的好友的username和添加理由
-                    try {
-                        EMClient.getInstance().contactManager().addContact(account, "");
-                    } catch (HyphenateException e) {
-                        e.printStackTrace();
-                    }
+                    //判断是否存在用户
                 } else {
                     Toast.makeText(getActivity(), "请输入完整", Toast.LENGTH_SHORT).show();
                 }

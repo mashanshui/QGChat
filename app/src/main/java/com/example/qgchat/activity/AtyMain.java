@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
@@ -58,9 +59,14 @@ import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMCmdMessageBody;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 import com.hyphenate.easeui.EaseConstant;
+import com.hyphenate.easeui.EaseUI;
 import com.hyphenate.easeui.domain.EaseUser;
 import com.hyphenate.easeui.ui.EaseBaseActivity;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
@@ -111,7 +117,21 @@ public class AtyMain extends BaseActivity {
     @BindView(R.id.weather_area)
     TextView weatherArea;
     private SharedPreferences preferences;
+    /**
+     * ViewPage中的聊天页面
+     */
+    private LayoutChats layoutChats;
+    /**
+     * ViewPage中的联系人页面
+     */
     private LayoutContacts layoutContacts;
+    /**
+     * ViewPage中的音乐界面
+     */
+    private LayoutMoments layoutMoments;
+    /**
+     * 百度地图定位
+     */
     public LocationClient mLocationClient = null;
     /**
      * 经度
@@ -224,7 +244,7 @@ public class AtyMain extends BaseActivity {
             }
         });
         toggle.syncState();
-        //setDrawerLayout();
+        setDrawerLayout();
         initViews();
         requestRuntimePermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.READ_PHONE_STATE,
@@ -242,6 +262,114 @@ public class AtyMain extends BaseActivity {
         });
     }
 
+    private void initViews() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        MainViewPageFragmentAdapter adapter = new MainViewPageFragmentAdapter(getSupportFragmentManager());
+
+        //消息页面
+        layoutChats = new LayoutChats();
+        layoutChats.setConversationListItemClickListener(new EaseConversationListFragment.EaseConversationListItemClickListener() {
+            @Override
+            public void onListItemClicked(EMConversation conversation) {
+                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, conversation.conversationId()));
+            }
+        });
+
+        //联系人页面
+        layoutContacts = new LayoutContacts();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                map = getContacts();
+                handler.sendEmptyMessage(1);
+            }
+        }).start();
+        layoutContacts.setContactListItemClickListener(new EaseContactListFragment.EaseContactListItemClickListener() {
+            @Override
+            public void onListItemClicked(EaseUser user) {
+                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, user.getUsername()));
+            }
+        });
+
+        //音乐页面
+        layoutMoments = new LayoutMoments();
+
+        adapter.addFragment(layoutChats);
+        adapter.addFragment(layoutContacts);
+        adapter.addFragment(layoutMoments);
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // 将当前的页面对应的底部标签设为选中状态
+                if (menuItem != null) {
+                    menuItem.setChecked(false);
+                } else {
+                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                }
+                menuItem = bottomNavigationView.getMenu().getItem(position);
+                menuItem.setChecked(true);
+                //设置标题
+                if (position == 0) {
+                    titleText.setText(R.string.title_message);
+                } else if (position == 1) {
+                    titleText.setText(R.string.title_person);
+                } else if (position == 2) {
+                    titleText.setText(R.string.title_condition);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EMClient.getInstance().chatManager().addMessageListener(messageListener);
+    }
+
+    EMMessageListener messageListener = new EMMessageListener() {
+
+        @Override
+        public void onMessageReceived(List<EMMessage> messages) {
+            for (EMMessage message : messages) {
+                EaseUI.getInstance().getNotifier().onNewMsg(message);
+            }
+            layoutChats.refresh();
+        }
+
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> messages) {
+
+        }
+
+        @Override
+        public void onMessageRead(List<EMMessage> messages) {
+        }
+
+        @Override
+        public void onMessageDelivered(List<EMMessage> message) {
+        }
+
+        @Override
+        public void onMessageRecalled(List<EMMessage> messages) {
+
+        }
+
+        @Override
+        public void onMessageChanged(EMMessage message, Object change) {
+
+        }
+    };
 
     /**
      * 初始化百度地图
@@ -316,7 +444,7 @@ public class AtyMain extends BaseActivity {
         account = preferences.getString("account", "");
 
         if (AccessNetwork.getNetworkState(AtyMain.this) != AccessNetwork.INTERNET_NONE) {
-            String url = HttpUtil.getAccountMessageURL + "?account=" + account;
+            String url = HttpUtil.getUserMessageURL + "?account=" + account;
             HttpUtil.sendOkHttpRequest(url, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -357,14 +485,37 @@ public class AtyMain extends BaseActivity {
                     case R.string.drawer_menu_setting:
                         break;
                     case R.string.exit_login:
-                        clearSharePreferences();
-                        deleteDataBase();
-                        restartApplication();
+                        loginOut();
                         break;
                     case R.string.drawer_menu_share:
                         showShare();
                         break;
                 }
+            }
+        });
+    }
+
+    private void loginOut() {
+        EMClient.getInstance().logout(true, new EMCallBack() {
+
+            @Override
+            public void onSuccess() {
+                // TODO Auto-generated method stub
+                clearSharePreferences();
+                deleteDataBase();
+                restartApplication();
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                // TODO Auto-generated method stub
+                setToast("退出登录失败");
             }
         });
     }
@@ -411,7 +562,6 @@ public class AtyMain extends BaseActivity {
     private void clearSharePreferences() {
         SharedPreferences preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.remove("login");
         editor.remove("account");
         editor.remove("password");
         editor.apply();
@@ -444,7 +594,6 @@ public class AtyMain extends BaseActivity {
         Map<String, EaseUser> map = new HashMap<>();
         try {
             List<String> userNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-//            KLog.e("......有几个好友:" + userNames.size());
             for (String userId : userNames) {
                 Log.i(TAG, "getContacts: " + "好友列表中有 : " + userId);
                 map.put(userId, new EaseUser(userId));
@@ -455,74 +604,7 @@ public class AtyMain extends BaseActivity {
         return map;
     }
 
-    private void initViews() {
-        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        MainViewPageFragmentAdapter adapter = new MainViewPageFragmentAdapter(getSupportFragmentManager());
 
-        //消息页面
-        LayoutChats layoutChats = new LayoutChats();
-        layoutChats.setConversationListItemClickListener(new EaseConversationListFragment.EaseConversationListItemClickListener() {
-            @Override
-            public void onListItemClicked(EMConversation conversation) {
-                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, conversation.conversationId()));
-            }
-        });
-
-        //联系人页面
-        layoutContacts = new LayoutContacts();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                map = getContacts();
-                handler.sendEmptyMessage(1);
-            }
-        }).start();
-        layoutContacts.setContactListItemClickListener(new EaseContactListFragment.EaseContactListItemClickListener() {
-            @Override
-            public void onListItemClicked(EaseUser user) {
-                startActivity(new Intent(AtyMain.this, AtyChatRoom.class).putExtra(EaseConstant.EXTRA_USER_ID, user.getUsername()));
-            }
-        });
-
-        //音乐页面
-        LayoutMoments layoutMoments = new LayoutMoments();
-
-        adapter.addFragment(layoutChats);
-        adapter.addFragment(layoutContacts);
-        adapter.addFragment(layoutMoments);
-        viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                // 将当前的页面对应的底部标签设为选中状态
-                if (menuItem != null) {
-                    menuItem.setChecked(false);
-                } else {
-                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
-                }
-                menuItem = bottomNavigationView.getMenu().getItem(position);
-                menuItem.setChecked(true);
-                //设置标题
-                if (position == 0) {
-                    titleText.setText(R.string.title_message);
-                } else if (position == 1) {
-                    titleText.setText(R.string.title_person);
-                } else if (position == 2) {
-                    titleText.setText(R.string.title_condition);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-    }
 
 
     @Override
@@ -608,6 +690,7 @@ public class AtyMain extends BaseActivity {
         mLocationClient.stop();
         stopService(serviceIntent);
         unbindService(connection);
+        EMClient.getInstance().chatManager().removeMessageListener(messageListener);
     }
 
 }

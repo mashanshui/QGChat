@@ -34,7 +34,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         android:layout_marginRight="32dp" />
 
-    <com.example.qgchat.util.StateButton
+    <com.example.qgchat.view.StateButton
         android:id="@+id/btn_register"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -40,6 +40,7 @@ public class AtyRegister extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aty_register);
+        setEventbus(true);
         ButterKnife.bind(this);
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setColorBar(ContextCompat.getColor(this, R.color.colorPrimary));

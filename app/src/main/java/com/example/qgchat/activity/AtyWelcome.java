@@ -1,5 +1,6 @@
 package com.example.qgchat.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,15 +12,25 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.qgchat.R;
+import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.loginAndregister.AtyLogin;
 import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
+import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 import com.hyphenate.chat.EMClient;
 
-import butterknife.ButterKnife;
+import java.io.IOException;
+import java.util.List;
 
-public class AtyWelcome extends AppCompatActivity {
+import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+public class AtyWelcome extends BaseActivity {
     private static final String TAG = "AtyWelcome";
     private static final int DELAY = 800;
     private static final int GO_GUIDE = 0;
@@ -38,7 +49,19 @@ public class AtyWelcome extends AppCompatActivity {
         ImageView welcome_image = (ImageView) findViewById(R.id.welcome_image);
         Glide.with(this).load(R.drawable.shot).into(welcome_image);
         preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
-        initLoad();
+        requestRuntimePermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
+            @Override
+            public void onGranted() {
+                initLoad();
+            }
+
+            @Override
+            public void onDenied(List<String> deniedPermission) {
+                finish();
+            }
+        });
     }
 
 

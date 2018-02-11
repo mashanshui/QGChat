@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.qgchat">
-    <!--连接网络权限，用于执行云端语音能力 -->
-    <uses-permission android:name="android.permission.INTERNET" />
+
     <!--获取手机录音机使用权限，听写、识别、语义理解需要用到此权限 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!--读取网络信息状态 -->
@@ -11,12 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!--允许程序改变网络连接状态 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <!--读取手机信息权限 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!--读取联系人权限，上传联系人需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <!--外存储写权限，构建语法需要用到此权限 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!--配置权限，用来记录应用配置信息 -->
@@ -57,6 +52,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
         android:name=".MyApplication"
@@ -67,18 +63,19 @@
         android:theme="@style/AppTheme">
         <activity android:name=".activity.AtyWelcome">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.AtyGuide" />
         <activity android:name=".loginAndregister.AtyLogin" />
-        <activity android:name=".activity.AtyMain" />
+        <activity android:name=".activity.AtyMain"
+                  android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity android:name=".TestActivity">
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
         <activity
@@ -172,6 +169,10 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+        <!--显示图片-->
+        <activity
+            android:name="com.hyphenate.easeui.ui.EaseShowBigImageActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

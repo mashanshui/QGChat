@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.R;
+import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.loginAndregister.AtyRegister;
 import com.example.qgchat.util.HttpUtil;
-import com.example.qgchat.util.StateButton;
+import com.example.qgchat.view.StateButton;
+import com.google.gson.Gson;
 import com.soundcloud.android.crop.Crop;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -59,11 +63,26 @@ public class RegisterFragment4 extends Fragment {
     @BindView(R.id.icon_preview)
     ImageView iconPreview;
     private Uri imageUri;
+    public static final int REQUEST_SUCCESS = 0;
+    public static final int REQUEST_FAIL = 1;
 
     public RegisterFragment4() {
         // Required empty public constructor
     }
 
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == REQUEST_SUCCESS) {
+                ((AtyRegister) getActivity()).dismissBufferDialog();
+                Toast.makeText(getActivity(), "上传成功", Toast.LENGTH_SHORT).show();
+                EventBus.getDefault().post(new Icon(true));
+            } else if (msg.what == REQUEST_FAIL) {
+                ((AtyRegister) getActivity()).dismissBufferDialog();
+                Toast.makeText(getActivity(), "上传失败", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -151,29 +170,23 @@ public class RegisterFragment4 extends Fragment {
         HttpUtil.uploadImage(HttpUtil.uploadImageURL, param, imagePath, filename, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((AtyRegister) getActivity()).dismissBufferDialog();
-                        Toast.makeText(getActivity(), "网络异常", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Message message = new Message();
+                message.what = REQUEST_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
-                String result = response.body().string();
-                if (result.equals("200")) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((AtyRegister) getActivity()).dismissBufferDialog();
-                            Toast.makeText(getActivity(), "上传成功", Toast.LENGTH_SHORT).show();
-                            EventBus.getDefault().post(new Icon(true));
-                        }
-                    });
-                } else {
-                    Toast.makeText(getActivity(), "上传失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                String responseData=response.body().string();
+                Gson gson=new Gson();
+                StatusResponse statusResponse=gson.fromJson(responseData,StatusResponse.class);
+                if (statusResponse.getCode().equals("200")) {
+                    message.what = REQUEST_SUCCESS;
+                    handler.sendMessage(message);
+                } else if (statusResponse.getCode().equals("400")) {
+                    message.what = REQUEST_FAIL;
+                    handler.sendMessage(message);
                 }
             }
         });

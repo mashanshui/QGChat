@@ -17,24 +17,28 @@ import okhttp3.RequestBody;
 
 public class HttpUtil {
 
-    //public static final String BaseWeb = "http://172.16.6.66";
-    public static final String BaseWeb = "http://www.chemaxianxing.com";
+    public static final String BaseWeb = "http://139.199.158.151";
+//    public static final String BaseWeb = "http://192.168.31.189";
     /**
      * 主域名
      */
-    public static final String BaseURL = BaseWeb+"/QGChat";
+    public static final String BaseURL = BaseWeb+"/qgchat";
     /**
      * 发送验证码
      */
-    public static final String sendCodeURL = BaseURL+"/SendMsg";
+    public static final String sendCodeURL = BaseURL+"/VerifyCode/SendMsg";
     /**
      * 验证验证码
      */
-    public static final String checkCodeURL = BaseURL+"/CheckMsg";
+    public static final String checkCodeURL = BaseURL+"/VerifyCode/CheckMsg";
+    /**
+     * 验证验证码
+     */
+    public static final String registerURL = BaseURL+"/user/register";
     /**
      * 上传图片
      */
-    public static final String uploadImageURL = BaseURL+"/UploadIcon";
+    public static final String uploadImageURL = BaseURL+"/user/uploadIcon";
     /**
      * 获取分组信息
      */
@@ -43,7 +47,7 @@ public class HttpUtil {
     /**
      * 获取账户信息
      */
-    public static final String getAccountMessageURL = BaseURL + "/getAccountMessage";
+    public static final String getUserMessageURL = BaseURL + "/user/getUserMessage";
 
     /**
      * 获取天气信息（和风天气）

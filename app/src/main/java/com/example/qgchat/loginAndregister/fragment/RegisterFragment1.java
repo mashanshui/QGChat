@@ -10,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.loginAndregister.AtyRegister;
 import com.example.qgchat.R;
 import com.example.qgchat.util.HttpUtil;
-import com.example.qgchat.util.StateButton;
+import com.example.qgchat.view.StateButton;
+import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.greenrobot.eventbus.EventBus;
@@ -93,11 +95,13 @@ public class RegisterFragment1 extends Fragment {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     Message message = new Message();
-                    String responsedata=response.body().string();
-                    if (responsedata.equals("success")) {
+                    String responseData=response.body().string();
+                    Gson gson=new Gson();
+                    StatusResponse statusResponse=gson.fromJson(responseData,StatusResponse.class);
+                    if (statusResponse.getCode().equals("200")) {
                         message.what = REQUEST_SUCCESS;
                         handler.sendMessage(message);
-                    } else if (responsedata.equals("fail")) {
+                    } else if (statusResponse.getCode().equals("400")) {
                         message.what = REQUEST_FAIL;
                         handler.sendMessage(message);
                     }

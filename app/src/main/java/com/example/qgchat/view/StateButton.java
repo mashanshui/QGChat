@@ -1,4 +1,4 @@
-package com.example.qgchat.util;
+package com.example.qgchat.view;
 
 import android.content.Context;
 import android.content.res.ColorStateList;

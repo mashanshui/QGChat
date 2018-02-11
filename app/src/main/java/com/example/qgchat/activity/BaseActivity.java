@@ -44,6 +44,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final String TAG = "info";
     private static PermissionListener permissionListener;
     private ProgressDialog dialog;
+    private boolean eventbus=false;
     protected InputMethodManager inputMethodManager;
 
     @Override
@@ -133,16 +134,23 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(this,value,Toast.LENGTH_SHORT).show();
     }
 
+    public void setEventbus(boolean eventbus) {
+        this.eventbus = eventbus;
+    }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        EventBus.getDefault().register(this);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        EventBus.getDefault().unregister(this);
-//        super.onStop();
-//    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (eventbus) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        if (eventbus) {
+            EventBus.getDefault().unregister(this);
+        }
+        super.onStop();
+    }
 }

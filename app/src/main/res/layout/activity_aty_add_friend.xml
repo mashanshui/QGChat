@@ -30,7 +30,7 @@
             android:textColor="#ffffff"
             android:textSize="20sp" />
 
-        <com.example.qgchat.util.StateButton
+        <com.example.qgchat.view.StateButton
             android:id="@+id/btn_next"
             android:layout_gravity="end"
             android:textColor="#ffffff"

@@ -8,46 +8,23 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.qgchat.R;
 import com.example.qgchat.activity.AtyMain;
 import com.example.qgchat.activity.BaseActivity;
-import com.example.qgchat.bean.UserBean;
-import com.example.qgchat.socket.LoginEvent;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.socket.ServerManager;
 import com.example.qgchat.util.AccessNetwork;
-import com.example.qgchat.util.BeanUtil;
-import com.example.qgchat.util.HttpUtil;
-import com.example.qgchat.util.StateButton;
+import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.UltimateBar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.io.IOException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
-
-import static com.example.qgchat.service.QGService.account;
-import static java.lang.System.load;
 
 public class AtyLogin extends BaseActivity {
     @BindView(R.id.icon)

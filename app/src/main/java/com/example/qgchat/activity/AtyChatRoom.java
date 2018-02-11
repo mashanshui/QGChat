@@ -4,38 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.qgchat.R;
-import com.example.qgchat.adapter.AdapterChatRoom;
-import com.example.qgchat.bean.ReceivedMsg;
-import com.example.qgchat.bean.SendMsg;
-import com.example.qgchat.bean.UserItemMsg;
-import com.example.qgchat.db.DBChatMsg;
-import com.example.qgchat.db.DBUserItemMsg;
-import com.example.qgchat.db.DBUserList;
 import com.example.qgchat.fragment.ChatRoomFragment;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.util.DBUtil;
-import com.example.qgchat.util.StateButton;
 import com.example.qgchat.util.UltimateBar;
 import com.hyphenate.easeui.EaseConstant;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-import org.litepal.crud.DataSupport;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
