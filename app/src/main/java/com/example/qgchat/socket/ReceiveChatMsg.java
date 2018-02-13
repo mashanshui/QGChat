@@ -56,18 +56,14 @@ class ReceiveChatMsg {
         String p = "\\[ACK_SEARCH_FRIEND_TRUE\\]:\\[(.*)\\]";
         Pattern pattern = Pattern.compile(p);
         Matcher matcher = pattern.matcher(msg);
-        if (matcher.find()) {
-            EventBus.getDefault().post(new EventBean.SerachFriendEventTrue(matcher.group(1).equals("1")));
-        }
+
     }
 
     private void dealSearchFriend(String msg) {
         String p = "\\[ACK_SEARCH_FRIEND\\]:\\[(.*)\\]";
         Pattern pattern = Pattern.compile(p);
         Matcher matcher = pattern.matcher(msg);
-        if (matcher.find()) {
-            EventBus.getDefault().post(new EventBean.SerachFriendEvent(matcher.group(1).equals("1")));
-        }
+
     }
 
     private void dealAckChatMsg(String msg) {

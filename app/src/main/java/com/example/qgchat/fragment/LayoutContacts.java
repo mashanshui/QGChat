@@ -34,6 +34,7 @@ public class LayoutContacts extends EaseContactListFragment {
     public void onStart() {
         super.onStart();
         hideTitleBar();
+        hideSoftKeyboard();
     }
 
     @Override

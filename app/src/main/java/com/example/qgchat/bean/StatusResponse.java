@@ -4,10 +4,20 @@ public class StatusResponse {
 
 	private String status;
 	private String code;
+	private String description;
 	
-	public StatusResponse(String status, String code) {
+	
+	public StatusResponse(String status, String code, String description) {
 		this.status = status;
 		this.code = code;
+		this.description = description;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	public String getStatus() {
 		return status;
@@ -21,5 +31,13 @@ public class StatusResponse {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "StatusResponse{" +
+				"status='" + status + '\'' +
+				", code='" + code + '\'' +
+				", description='" + description + '\'' +
+				'}';
+	}
 }

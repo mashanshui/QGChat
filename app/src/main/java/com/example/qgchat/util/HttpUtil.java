@@ -17,8 +17,8 @@ import okhttp3.RequestBody;
 
 public class HttpUtil {
 
-    public static final String BaseWeb = "http://139.199.158.151";
-//    public static final String BaseWeb = "http://192.168.31.189";
+//    public static final String BaseWeb = "http://139.199.158.151";
+    public static final String BaseWeb = "http://192.168.31.189";
     /**
      * 主域名
      */
@@ -48,6 +48,16 @@ public class HttpUtil {
      * 获取账户信息
      */
     public static final String getUserMessageURL = BaseURL + "/user/getUserMessage";
+
+    /**
+     * 添加好友，检查好友是否存在，是否已经是好友了
+     */
+    public static final String checkFriendURL = BaseURL + "/user/checkFriend";
+
+    /**
+     * 添加好友
+     */
+    public static final String addFriendURL = BaseURL + "/user/addFriend";
 
     /**
      * 获取天气信息（和风天气）

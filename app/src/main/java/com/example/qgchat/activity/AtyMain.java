@@ -595,7 +595,6 @@ public class AtyMain extends BaseActivity {
         try {
             List<String> userNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
             for (String userId : userNames) {
-                Log.i(TAG, "getContacts: " + "好友列表中有 : " + userId);
                 map.put(userId, new EaseUser(userId));
             }
         } catch (HyphenateException e) {

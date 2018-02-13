@@ -24,7 +24,6 @@ public class LayoutChats extends EaseConversationListFragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -33,10 +32,12 @@ public class LayoutChats extends EaseConversationListFragment {
         return super.onCreateView(inflater,container,savedInstanceState);
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
         hideTitleBar();
+        hideSoftKeyboard();
     }
 
     @Override
