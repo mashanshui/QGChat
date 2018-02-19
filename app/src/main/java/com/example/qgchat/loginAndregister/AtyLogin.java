@@ -8,23 +8,36 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.qgchat.R;
 import com.example.qgchat.activity.AtyMain;
 import com.example.qgchat.activity.BaseActivity;
+import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.util.AccessNetwork;
+import com.example.qgchat.util.BeanUtil;
+import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.UltimateBar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class AtyLogin extends BaseActivity {
     @BindView(R.id.icon)
@@ -71,46 +84,46 @@ public class AtyLogin extends BaseActivity {
         setSupportActionBar(toolBar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
-//        edtAccount.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (s.length() == 11 && AccessNetwork.getNetworkState(AtyLogin.this) != AccessNetwork.INTERNET_NONE) {
-//                    String url = HttpUtil.getAccountMessageURL + "?account=" + s.toString();
-//                    HttpUtil.sendOkHttpRequest(url, new Callback() {
-//                        @Override
-//                        public void onFailure(Call call, IOException e) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onResponse(Call call, Response response) throws IOException {
-//                            final String result = response.body().string();
-//                            if (!result.equals("failed")) {
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        UserBean bean = BeanUtil.handleUserBeanResponse(result);
-//                                        if (bean.getIconURL() != null) {
-//                                            Glide.with(AtyLogin.this).load(bean.getIconURL()).diskCacheStrategy(DiskCacheStrategy.NONE).into(icon);
-//                                        }
-//                                    }
-//                                });
-//                            }
-//                        }
-//                    });
-//                }
-//            }
-//        });
+        edtAccount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 11 && AccessNetwork.getNetworkState(AtyLogin.this) != AccessNetwork.INTERNET_NONE) {
+                    String url = HttpUtil.getUserMessageURL + "?account=" + s.toString();
+                    HttpUtil.sendOkHttpRequest(url, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            final String result = response.body().string();
+                            if (!TextUtils.isEmpty(result)) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        UserBean bean = BeanUtil.handleUserBeanResponse(result);
+                                        if (bean.getIconURL() != null) {
+                                            Glide.with(AtyLogin.this).load(bean.getIconURL()).diskCacheStrategy(DiskCacheStrategy.NONE).into(icon);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @OnClick({R.id.btn_login, R.id.forget_password, R.id.register})

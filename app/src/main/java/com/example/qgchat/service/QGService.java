@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.qgchat.activity.AtyChatRoom;
 import com.example.qgchat.bean.ReceivedMsg;
 import com.example.qgchat.db.DBChatMsg;
+import com.example.qgchat.db.DBInviteMessage;
 import com.example.qgchat.loginAndregister.AtyLogin;
 import com.example.qgchat.socket.LoginEvent;
 import com.example.qgchat.socket.ParaseData;
@@ -22,12 +23,15 @@ import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.NotificationUtil;
 import com.example.qgchat.util.StringUtil;
+import com.hyphenate.EMContactListener;
+import com.hyphenate.chat.EMClient;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class QGService extends Service implements MediaPlayer.OnCompletionListener,MediaPlayer.OnBufferingUpdateListener,MediaPlayer.OnPreparedListener{
     private QGBinder mBinder = new QGBinder();
@@ -41,6 +45,7 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
     @Override
     public void onCreate() {
         super.onCreate();
+        EMClient.getInstance().contactManager().setContactListener(new MyContactListener());
         EventBus.getDefault().register(this);
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -50,7 +55,7 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;
     }
 
     @Override
@@ -66,19 +71,6 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
     @Override
     public void onPrepared(MediaPlayer mp) {
         mediaPlayer.start();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(ReceivedMsg receivedMsg) {
-        Intent intent = new Intent(this, AtyChatRoom.class);
-        intent.putExtra("friend_account", receivedMsg.getChatObj());
-        DBChatMsg msg = new DBChatMsg();
-        msg.setMsgType(receivedMsg.getMsgType());
-        msg.setContent(receivedMsg.getContent());
-        DBUtil.saveChatMsg(receivedMsg.getChatObj(),msg);
-        if (NotificationUtil.isBackground(this)) {
-            NotificationUtil.setChatMsgNotification(this,receivedMsg.getUsername(),receivedMsg.getContent(),intent);
-        }
     }
 
 
@@ -115,14 +107,6 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
         }
     }
 
-
-    private void goLogin() {
-        Intent intent = new Intent(ActivityCollector.getTopActivity(), AtyLogin.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
@@ -131,6 +115,23 @@ public class QGService extends Service implements MediaPlayer.OnCompletionListen
 
     public class QGBinder extends Binder {
 
+    }
+
+    public class MyContactListener implements EMContactListener {
+        @Override
+        public void onContactAdded(String username) {
+        }
+        @Override
+        public void onContactDeleted(final String username) {
+        }
+        @Override
+        public void onContactInvited(String username, String reason) {
+        }
+        @Override
+        public void onFriendRequestAccepted(String username) {
+        }
+        @Override
+        public void onFriendRequestDeclined(String username) {}
     }
 
     @Override

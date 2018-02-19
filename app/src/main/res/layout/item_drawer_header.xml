@@ -25,13 +25,12 @@
         android:layout_height="24dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:paddingLeft="16dp"
         android:textColor="@color/white"
         android:textSize="@dimen/text_large"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/sdv_icon"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/sdv_icon" />
 
 </android.support.constraint.ConstraintLayout>

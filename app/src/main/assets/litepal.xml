@@ -13,6 +13,7 @@
         <mapping class="com.example.qgchat.db.DBChatMsg"></mapping>
         <mapping class="com.example.qgchat.db.DBUser"></mapping>
         <mapping class="com.example.qgchat.db.DBWeather"></mapping>
+        <mapping class="com.example.qgchat.db.DBInviteMessage"></mapping>
     </list>
 
 </litepal>

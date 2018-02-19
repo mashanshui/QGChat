@@ -73,9 +73,10 @@ public class SearchFragment extends Fragment {
         btn_next.setText("下一步");
         ownerAccount=((AtyAddFriend)getActivity()).ownerAccount;
         edt_number = (MaterialEditText) view.findViewById(R.id.edt_number);
-        getActivity().findViewById(R.id.btn_next).setOnClickListener(new View.OnClickListener() {
+        btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ((AtyAddFriend) getActivity()).hideSoftKeyboard();
                 friendAccount = edt_number.getText().toString();
                 if (!StringUtil.isEmpty(friendAccount,ownerAccount)) {
                     ((AtyAddFriend) getActivity()).showBufferDialog();

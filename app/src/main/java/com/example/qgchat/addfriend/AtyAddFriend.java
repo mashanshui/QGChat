@@ -27,6 +27,8 @@ import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 import com.google.gson.Gson;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -57,7 +59,7 @@ public class AtyAddFriend extends BaseActivity {
         @Override
         public void handleMessage(Message msg) {
             dismissBufferDialog();
-            Log.e(TAG, "handleMessage: "+msg.what );
+            Log.e(TAG, "handleMessage: " + msg.what);
             if (msg.what == REQUEST_SUCCESS) {
                 setToast("添加成功");
                 finish();
@@ -123,7 +125,30 @@ public class AtyAddFriend extends BaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showBufferDialog();
-                addFriend();
+//                addFriend();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            EMClient.getInstance().contactManager().addContact(friendAccount, "no reason");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dismissBufferDialog();
+                                    setToast("等待对方验证");
+                                }
+                            });
+                        } catch (final HyphenateException e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dismissBufferDialog();
+                                    setToast(e.getMessage());
+                                }
+                            });
+                        }
+                    }
+                }).start();
             }
         });
         dialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {

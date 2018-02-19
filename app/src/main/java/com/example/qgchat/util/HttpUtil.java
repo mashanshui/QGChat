@@ -17,8 +17,8 @@ import okhttp3.RequestBody;
 
 public class HttpUtil {
 
-//    public static final String BaseWeb = "http://139.199.158.151";
-    public static final String BaseWeb = "http://192.168.31.189";
+    public static final String BaseWeb = "http://139.199.158.151";
+//    public static final String BaseWeb = "http://192.168.31.189";
     /**
      * 主域名
      */

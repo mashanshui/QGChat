@@ -145,7 +145,7 @@ public class RegisterFragment4 extends Fragment {
             file.delete();
         }
         Uri destination = Uri.fromFile(file);
-        Crop.of(source, destination).asSquare().withMaxSize(300, 300).start(getContext(), RegisterFragment4.this);
+        Crop.of(source, destination).asSquare().withMaxSize(500, 500).start(getContext(), RegisterFragment4.this);
     }
 
     private void handleCrop(int resultCode, Intent result) {

@@ -82,6 +82,7 @@
             android:name=".activity.AtyChatRoom"
             android:launchMode="singleTask" />
         <activity android:name=".loginAndregister.AtyRegister" />
+        <activity android:name=".activity.NewFriendsMsgActivity" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
         <activity

@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import com.example.qgchat.R;
 

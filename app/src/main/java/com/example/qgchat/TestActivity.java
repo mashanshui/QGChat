@@ -2,9 +2,16 @@ package com.example.qgchat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.example.qgchat.db.DBInviteMessage;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
+
+import org.litepal.crud.DataSupport;
+
+import java.util.Date;
+import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "TestActivity";
@@ -13,17 +20,18 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aty_welcome);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //注册失败会抛出HyphenateException
-                try {
-                    EMClient.getInstance().createAccount("shanshui2", "123456");//同步方法
-                } catch (HyphenateException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        DBInviteMessage new_friend = new DBInviteMessage();
+        new_friend.setStatus(DBInviteMessage.BEAPPLYED);
+        new_friend.setReason("reason");
+        Date date=new Date();
+        new_friend.setTime(date.getTime());
+        new_friend.setFrom("188985");
+        new_friend.save();
+        List<DBInviteMessage> msgs = DataSupport.findAll(DBInviteMessage.class);
+        for (DBInviteMessage msg : msgs) {
+            Log.e(TAG, "onCreate: "+msg.getStatus());
+        }
+
 //        DBUserList dbUserList = new DBUserList();
 //        dbUserList.setUsername("mashanshui");
 //        dbUserList.setIconURL("");

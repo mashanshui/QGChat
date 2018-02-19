@@ -40,9 +40,11 @@ import com.example.qgchat.adapter.DrawerAdapter;
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.DrawerList;
+import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.bean.Weather;
 import com.example.qgchat.db.DBChatMsg;
+import com.example.qgchat.db.DBInviteMessage;
 import com.example.qgchat.db.DBUser;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
@@ -58,8 +60,12 @@ import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
+import com.example.qgchat.util.PreferencesUtil;
 import com.example.qgchat.util.UltimateBar;
+import com.google.gson.Gson;
 import com.hyphenate.EMCallBack;
+import com.hyphenate.EMClientListener;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMCmdMessageBody;
@@ -80,6 +86,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +123,6 @@ public class AtyMain extends BaseActivity {
     TextView weatherTemp;
     @BindView(R.id.weather_area)
     TextView weatherArea;
-    private SharedPreferences preferences;
     /**
      * ViewPage中的聊天页面
      */
@@ -129,6 +135,10 @@ public class AtyMain extends BaseActivity {
      * ViewPage中的音乐界面
      */
     private LayoutMoments layoutMoments;
+    /**
+     * 联系人
+     */
+    private Map<String, EaseUser> contactsMap;
     /**
      * 百度地图定位
      */
@@ -146,6 +156,7 @@ public class AtyMain extends BaseActivity {
     private Intent serviceIntent;
     private QGService.QGBinder mBinder = null;
     private DrawerAdapter drawerAdapter;
+    private PreferencesUtil preferencesUtil;
     //侧滑菜单菜单项
     private List<DrawerList> drawerList = Arrays.asList(
             new DrawerList(R.drawable.ic_search_black_24dp, R.string.drawer_menu_search),
@@ -193,16 +204,6 @@ public class AtyMain extends BaseActivity {
         }
     };
 
-    private Map<String, EaseUser> map;
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 1) {
-                layoutContacts.setContactsMap(map);
-                layoutContacts.refresh();
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,12 +219,16 @@ public class AtyMain extends BaseActivity {
         //注册监听函数
         mLocationClient.registerLocationListener(new MyLocationListener());
 
-        preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
+        preferencesUtil = new PreferencesUtil(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
         titleText.setText("消息");
+
+        EMClient.getInstance().contactManager().setContactListener(new MyContactListener());
+        EMClient.getInstance().addClientListener(clientListener);
 
         //开启绑定服务
         serviceIntent = new Intent(this, QGService.class);
@@ -277,13 +282,7 @@ public class AtyMain extends BaseActivity {
 
         //联系人页面
         layoutContacts = new LayoutContacts();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                map = getContacts();
-                handler.sendEmptyMessage(1);
-            }
-        }).start();
+        refreshUIWithContacts();
         layoutContacts.setContactListItemClickListener(new EaseContactListFragment.EaseContactListItemClickListener() {
             @Override
             public void onListItemClicked(EaseUser user) {
@@ -331,10 +330,51 @@ public class AtyMain extends BaseActivity {
         });
     }
 
+    EMClientListener clientListener = new EMClientListener() {
+        @Override
+        public void onMigrate2x(boolean success) {
+            if (success) {
+                refreshUIWithMessage();
+            }
+        }
+    };
+
+    private void refreshUIWithContacts() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                contactsMap = getContacts();
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        // refresh conversation list
+                        if (layoutContacts != null) {
+                            layoutContacts.setContactsMap(contactsMap);
+                            layoutContacts.refresh();
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void refreshUIWithMessage() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                // refresh conversation list
+                if (layoutChats != null) {
+                    layoutChats.refresh();
+                }
+            }
+        });
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
         EMClient.getInstance().chatManager().addMessageListener(messageListener);
+//        //当回到页面时取消显示的通知
+//        EaseUI.getInstance().getNotifier().reset();
     }
 
     EMMessageListener messageListener = new EMMessageListener() {
@@ -344,12 +384,12 @@ public class AtyMain extends BaseActivity {
             for (EMMessage message : messages) {
                 EaseUI.getInstance().getNotifier().onNewMsg(message);
             }
-            layoutChats.refresh();
+            refreshUIWithMessage();
         }
 
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
-
+//            EMClient.getInstance().chatManager().getConversationsByType();
         }
 
         @Override
@@ -370,6 +410,73 @@ public class AtyMain extends BaseActivity {
 
         }
     };
+
+    public class MyContactListener implements EMContactListener {
+        @Override
+        public void onContactAdded(String username) {
+            refreshUIWithContacts();
+        }
+
+        @Override
+        public void onContactDeleted(final String username) {
+            refreshUIWithContacts();
+        }
+
+        @Override
+        public void onContactInvited(String username, String reason) {
+            Log.e(TAG, "onContactInvited: ===============" + username);
+            DBInviteMessage new_friend = new DBInviteMessage();
+            new_friend.setStatus(DBInviteMessage.BEINVITEED);
+            new_friend.setReason(reason);
+            Date date = new Date();
+            new_friend.setTime(date.getTime());
+            new_friend.setFrom(username);
+            new_friend.save();
+            preferencesUtil.setUnreadMsgCount(preferencesUtil.getUnreadMsgCount() + 1);
+            refreshUIWithContacts();
+        }
+
+        @Override
+        public void onFriendRequestAccepted(String username) {
+            DBInviteMessage new_friend = new DBInviteMessage();
+            new_friend.setStatus(DBInviteMessage.BEAGREED);
+            Date date = new Date();
+            new_friend.setTime(date.getTime());
+            new_friend.setFrom(username);
+            new_friend.save();
+            refreshUIWithContacts();
+            addFriend(preferencesUtil.getAccount(),username);
+        }
+
+        @Override
+        public void onFriendRequestDeclined(String username) {
+            DBInviteMessage new_friend = new DBInviteMessage();
+            new_friend.setStatus(DBInviteMessage.BEREFUSED);
+            Date date = new Date();
+            new_friend.setTime(date.getTime());
+            new_friend.setFrom(username);
+            new_friend.save();
+        }
+
+    }
+
+    private void addFriend(String ownerAccount,String friendAccount) {
+        String url = HttpUtil.addFriendURL + "?ownerAccount=" + ownerAccount + "&friendAccount=" + friendAccount;
+        HttpUtil.sendOkHttpRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message message = new Message();
+                String responseData = response.body().string();
+                Gson gson = new Gson();
+                StatusResponse statusResponse = gson.fromJson(responseData, StatusResponse.class);
+            }
+        });
+    }
 
     /**
      * 初始化百度地图
@@ -414,7 +521,7 @@ public class AtyMain extends BaseActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     String result = response.body().string();
                     Weather weather = BeanUtil.handleWeatherResponse(result);
-                    String account = preferences.getString("account", null);
+                    String account = preferencesUtil.getAccount();
                     DBUtil.saveWeather(account, weather);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -585,26 +692,6 @@ public class AtyMain extends BaseActivity {
         tvLogin.setText(title);
     }
 
-    /**
-     * 获取联系人
-     *
-     * @return
-     */
-    private Map<String, EaseUser> getContacts() {
-        Map<String, EaseUser> map = new HashMap<>();
-        try {
-            List<String> userNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
-            for (String userId : userNames) {
-                map.put(userId, new EaseUser(userId));
-            }
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-        }
-        return map;
-    }
-
-
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -681,6 +768,24 @@ public class AtyMain extends BaseActivity {
             }
         }
         return super.onPrepareOptionsPanel(view, menu);
+    }
+
+    /**
+     * 获取联系人
+     *
+     * @return
+     */
+    private Map<String, EaseUser> getContacts() {
+        Map<String, EaseUser> map = new HashMap<>();
+        try {
+            List<String> userNames = EMClient.getInstance().contactManager().getAllContactsFromServer();
+            for (String userId : userNames) {
+                map.put(userId, new EaseUser(userId));
+            }
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
     @Override
