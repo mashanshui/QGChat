@@ -15,8 +15,8 @@ import com.example.qgchat.R;
 import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.util.HttpUtil;
-import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.StringUtil;
+import com.example.qgchat.view.StateButton;
 import com.google.gson.Gson;
 import com.rengwuxian.materialedittext.MaterialEditText;
 

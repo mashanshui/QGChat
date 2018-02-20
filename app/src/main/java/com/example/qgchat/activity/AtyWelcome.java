@@ -6,29 +6,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.qgchat.R;
 import com.example.qgchat.listener.PermissionListener;
 import com.example.qgchat.loginAndregister.AtyLogin;
-import com.example.qgchat.socket.ServerManager;
-import com.example.qgchat.util.AccessNetwork;
-import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 import com.hyphenate.chat.EMClient;
 
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class AtyWelcome extends BaseActivity {
     private static final String TAG = "AtyWelcome";

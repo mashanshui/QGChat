@@ -1,6 +1,5 @@
 package com.example.qgchat.adapter;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 

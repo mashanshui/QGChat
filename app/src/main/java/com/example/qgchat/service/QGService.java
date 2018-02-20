@@ -2,26 +2,12 @@ package com.example.qgchat.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.example.qgchat.activity.AtyChatRoom;
-import com.example.qgchat.bean.ReceivedMsg;
-import com.example.qgchat.db.DBChatMsg;
-import com.example.qgchat.db.DBInviteMessage;
-import com.example.qgchat.loginAndregister.AtyLogin;
-import com.example.qgchat.socket.LoginEvent;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.socket.ServerManager;
-import com.example.qgchat.util.ActivityCollector;
-import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.EventBean;
-import com.example.qgchat.util.NotificationUtil;
 import com.example.qgchat.util.StringUtil;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
@@ -31,7 +17,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
-import java.util.Date;
 
 public class QGService extends Service implements MediaPlayer.OnCompletionListener,MediaPlayer.OnBufferingUpdateListener,MediaPlayer.OnPreparedListener{
     private QGBinder mBinder = new QGBinder();

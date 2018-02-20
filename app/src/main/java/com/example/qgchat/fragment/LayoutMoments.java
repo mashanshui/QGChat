@@ -2,7 +2,6 @@ package com.example.qgchat.fragment;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -24,10 +22,7 @@ import com.example.qgchat.R;
 import com.example.qgchat.activity.BaseActivity;
 import com.example.qgchat.adapter.MomentsRecycleAdapter;
 import com.example.qgchat.bean.ShowMusicItem;
-import com.example.qgchat.bean.UserMoments;
-import com.example.qgchat.broadcast.NetworkChangeReceiver;
 import com.example.qgchat.listener.PermissionListener;
-import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.GridItemDecoration;
 import com.example.qgchat.util.MusicUtil;
@@ -43,14 +38,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.security.KeyRep;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;

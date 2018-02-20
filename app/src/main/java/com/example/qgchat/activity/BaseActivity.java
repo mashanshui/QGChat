@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,27 +11,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.example.qgchat.broadcast.NetworkChangeReceiver;
 import com.example.qgchat.listener.PermissionListener;
-import com.example.qgchat.loginAndregister.AtyLogin;
-import com.example.qgchat.socket.LoginEvent;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.socket.ServerManager;
-import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.ActivityCollector;
 import com.example.qgchat.util.HttpUtil;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

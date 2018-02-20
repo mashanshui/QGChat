@@ -2,10 +2,7 @@ package com.example.qgchat.fragment;
 
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,22 +11,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.qgchat.R;
-import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
-import com.hyphenate.chat.EMTextMessageBody;
-import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.ui.EaseChatFragment;
-import com.hyphenate.easeui.widget.EaseChatExtendMenu;
 import com.hyphenate.easeui.widget.chatrow.EaseCustomChatRowProvider;
-import com.hyphenate.exceptions.HyphenateException;
-import com.hyphenate.util.PathUtil;
-
-import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * A simple {@link Fragment} subclass.

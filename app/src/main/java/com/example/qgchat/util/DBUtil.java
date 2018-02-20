@@ -1,7 +1,5 @@
 package com.example.qgchat.util;
 
-import android.util.Log;
-
 import com.example.qgchat.bean.GroupMessage;
 import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.bean.Weather;
@@ -11,8 +9,6 @@ import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
 import com.example.qgchat.db.DBUserList;
 import com.example.qgchat.db.DBWeather;
-
-import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
