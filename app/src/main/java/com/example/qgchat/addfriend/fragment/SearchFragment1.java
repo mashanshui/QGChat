@@ -14,13 +14,10 @@ import android.widget.Toast;
 import com.example.qgchat.R;
 import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.StatusResponse;
-import com.example.qgchat.loginAndregister.AtyRegister;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.StringUtil;
 import com.google.gson.Gson;
-import com.hyphenate.chat.EMClient;
-import com.hyphenate.exceptions.HyphenateException;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,9 +31,9 @@ import okhttp3.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment1 extends Fragment {
 
-    private static final String TAG = "SearchFragment";
+    private static final String TAG = "SearchFragment1";
     private MaterialEditText edt_number;
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAIL = 1;
@@ -44,7 +41,7 @@ public class SearchFragment extends Fragment {
     private String ownerAccount=null;
     private String friendAccount=null;
 
-    public SearchFragment() {
+    public SearchFragment1() {
         // Required empty public constructor
     }
 
@@ -68,7 +65,7 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.addfriend_fragment_search, container, false);
+        View view = inflater.inflate(R.layout.addfriend_fragment_search1, container, false);
         StateButton btn_next= (StateButton) getActivity().findViewById(R.id.btn_next);
         btn_next.setText("下一步");
         ownerAccount=((AtyAddFriend)getActivity()).ownerAccount;

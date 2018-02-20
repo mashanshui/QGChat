@@ -48,10 +48,14 @@ public class AtyWelcome extends BaseActivity {
         ultimateBar.setImmersionBar();
         ImageView welcome_image = (ImageView) findViewById(R.id.welcome_image);
         Glide.with(this).load(R.drawable.shot).into(welcome_image);
-        preferences=getSharedPreferences("qgchat",MODE_PRIVATE);
+        preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
         requestRuntimePermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.RECORD_AUDIO,
+        }, new PermissionListener() {
             @Override
             public void onGranted() {
                 initLoad();
@@ -73,9 +77,9 @@ public class AtyWelcome extends BaseActivity {
         /** 是否登陆过，也就是是否有缓存的帐号密码 */
         boolean login = EMClient.getInstance().isLoggedInBefore();
         if (welcome) {
-            handler.sendEmptyMessageDelayed(GO_GUIDE,DELAY);
-            SharedPreferences.Editor editor=preferences.edit();
-            editor.putBoolean("welcome",false);
+            handler.sendEmptyMessageDelayed(GO_GUIDE, DELAY);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("welcome", false);
             editor.apply();
         } else if (!login) {
             handler.sendEmptyMessageDelayed(GO_LOGIN, DELAY);
@@ -86,10 +90,10 @@ public class AtyWelcome extends BaseActivity {
         }
     }
 
-    Handler handler=new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what==GO_GUIDE){
+            if (msg.what == GO_GUIDE) {
                 goGuide();
             } else if (msg.what == GO_LOGIN) {
                 goLogin();

@@ -23,7 +23,7 @@ public class PreferencesUtil {
 
     public void setUnreadMsgCount(int count){
         SharedPreferences.Editor editor=sp.edit();
-        editor.putInt("unreadMsgCount", 0);
+        editor.putInt("unreadMsgCount", count);
         editor.apply();
     }
 

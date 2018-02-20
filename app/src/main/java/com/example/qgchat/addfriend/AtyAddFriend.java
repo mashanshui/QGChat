@@ -15,22 +15,18 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.qgchat.R;
 import com.example.qgchat.activity.BaseActivity;
-import com.example.qgchat.addfriend.fragment.SearchFragment;
+import com.example.qgchat.addfriend.fragment.SearchFragment1;
+import com.example.qgchat.addfriend.fragment.SearchFragment2;
 import com.example.qgchat.bean.StatusResponse;
-import com.example.qgchat.loginAndregister.AtyRegister;
-import com.example.qgchat.socket.ParaseData;
-import com.example.qgchat.util.EventBean;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.UltimateBar;
 import com.google.gson.Gson;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -50,6 +46,7 @@ public class AtyAddFriend extends BaseActivity {
     FrameLayout fragmentLayout;
     public String friendAccount = null;
     public String ownerAccount = null;
+    public String message = null;
     private SharedPreferences preferences;
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAIL = 1;
@@ -97,7 +94,7 @@ public class AtyAddFriend extends BaseActivity {
                 }
             }
         });
-        replaceFragment(new SearchFragment());
+        replaceFragment(new SearchFragment1());
         getFragmentManager().executePendingTransactions();
     }
 
@@ -110,11 +107,18 @@ public class AtyAddFriend extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessage(SearchFragment.SearchFriendEvent searchFriendEvent) {
+    public void onMessage(SearchFragment1.SearchFriendEvent searchFriendEvent) {
         if (searchFriendEvent.isExist) {
             friendAccount = searchFriendEvent.friendAccount;
-            showDialog();
+            SearchFragment2 searchFragment2 = new SearchFragment2();
+            replaceFragment(searchFragment2);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessage(SearchFragment2.SearchMessage searchMessage) {
+        message=searchMessage.getMessage();
+        showDialog();
     }
 
     private void showDialog() {
@@ -130,12 +134,13 @@ public class AtyAddFriend extends BaseActivity {
                     @Override
                     public void run() {
                         try {
-                            EMClient.getInstance().contactManager().addContact(friendAccount, "no reason");
+                            EMClient.getInstance().contactManager().addContact(friendAccount, message);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     dismissBufferDialog();
                                     setToast("等待对方验证");
+                                    finish();
                                 }
                             });
                         } catch (final HyphenateException e) {

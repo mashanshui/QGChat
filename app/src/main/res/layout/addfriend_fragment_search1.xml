@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAFAFA"
-    tools:context="com.example.qgchat.addfriend.fragment.SearchFragment">
+    tools:context="com.example.qgchat.addfriend.fragment.SearchFragment1">
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/edt_number"

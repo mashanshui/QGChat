@@ -74,6 +74,7 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.easeui.EaseUI;
 import com.hyphenate.easeui.domain.EaseUser;
+import com.hyphenate.easeui.model.EaseNotifier;
 import com.hyphenate.easeui.ui.EaseBaseActivity;
 import com.hyphenate.easeui.ui.EaseContactListFragment;
 import com.hyphenate.easeui.ui.EaseConversationListFragment;
@@ -373,8 +374,8 @@ public class AtyMain extends BaseActivity {
     protected void onResume() {
         super.onResume();
         EMClient.getInstance().chatManager().addMessageListener(messageListener);
-//        //当回到页面时取消显示的通知
-//        EaseUI.getInstance().getNotifier().reset();
+        //当回到页面时取消显示的通知
+        EaseUI.getInstance().getNotifier().reset();
     }
 
     EMMessageListener messageListener = new EMMessageListener() {
@@ -382,6 +383,39 @@ public class AtyMain extends BaseActivity {
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
             for (EMMessage message : messages) {
+                EaseUI.getInstance().getNotifier().setNotificationInfoProvider(new EaseNotifier.EaseNotificationInfoProvider() {
+                    @Override
+                    public String getDisplayedText(EMMessage message) {
+                        return null;
+                    }
+
+                    @Override
+                    public String getLatestText(EMMessage message, int fromUsersNum, int messageNum) {
+                        return null;
+                    }
+
+                    @Override
+                    public String getTitle(EMMessage message) {
+                        return null;
+                    }
+
+                    @Override
+                    public int getSmallIcon(EMMessage message) {
+                        return 0;
+                    }
+
+                    @Override
+                    public Intent getLaunchIntent(EMMessage message) {
+                        //设置点击通知栏跳转事件
+                        Intent intent = new Intent(AtyMain.this, AtyChatRoom.class);
+                        EMMessage.ChatType chatType = message.getChatType();
+                        if (chatType == EMMessage.ChatType.Chat) { // 单聊信息
+                            intent.putExtra(EaseConstant.EXTRA_CHAT_TYPE, EaseConstant.CHATTYPE_SINGLE);
+                            intent.putExtra(EaseConstant.EXTRA_USER_ID, message.getFrom());
+                        }
+                        return intent;
+                    }
+                });
                 EaseUI.getInstance().getNotifier().onNewMsg(message);
             }
             refreshUIWithMessage();
@@ -389,7 +423,6 @@ public class AtyMain extends BaseActivity {
 
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
-//            EMClient.getInstance().chatManager().getConversationsByType();
         }
 
         @Override
@@ -423,8 +456,7 @@ public class AtyMain extends BaseActivity {
         }
 
         @Override
-        public void onContactInvited(String username, String reason) {
-            Log.e(TAG, "onContactInvited: ===============" + username);
+        public void onContactInvited(final String username, String reason) {
             DBInviteMessage new_friend = new DBInviteMessage();
             new_friend.setStatus(DBInviteMessage.BEINVITEED);
             new_friend.setReason(reason);
@@ -434,6 +466,34 @@ public class AtyMain extends BaseActivity {
             new_friend.save();
             preferencesUtil.setUnreadMsgCount(preferencesUtil.getUnreadMsgCount() + 1);
             refreshUIWithContacts();
+            EMMessage emMessage = EMMessage.createReceiveMessage(EMMessage.Type.TXT);
+            EaseUI.getInstance().getNotifier().setNotificationInfoProvider(new EaseNotifier.EaseNotificationInfoProvider() {
+                @Override
+                public String getDisplayedText(EMMessage message) {
+                    return username+"请求添加你为好友";
+                }
+
+                @Override
+                public String getLatestText(EMMessage message, int fromUsersNum, int messageNum) {
+                    return username+"请求添加你为好友";
+                }
+
+                @Override
+                public String getTitle(EMMessage message) {
+                    return "好友请求";
+                }
+
+                @Override
+                public int getSmallIcon(EMMessage message) {
+                    return 0;
+                }
+
+                @Override
+                public Intent getLaunchIntent(EMMessage message) {
+                    return new Intent(AtyMain.this, NewFriendsMsgActivity.class);
+                }
+            });
+            EaseUI.getInstance().getNotifier().onNewMsg(emMessage);
         }
 
         @Override
