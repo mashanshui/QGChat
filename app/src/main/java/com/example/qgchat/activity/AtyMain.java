@@ -2,13 +2,15 @@ package com.example.qgchat.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.ContextCompat;
@@ -37,11 +39,9 @@ import com.example.qgchat.adapter.DrawerAdapter;
 import com.example.qgchat.adapter.MainViewPageFragmentAdapter;
 import com.example.qgchat.addfriend.AtyAddFriend;
 import com.example.qgchat.bean.DrawerList;
-import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.bean.Weather;
 import com.example.qgchat.db.DBChatMsg;
-import com.example.qgchat.db.DBInviteMessage;
 import com.example.qgchat.db.DBUser;
 import com.example.qgchat.db.DBUserGruop;
 import com.example.qgchat.db.DBUserItemMsg;
@@ -59,7 +59,6 @@ import com.example.qgchat.util.DBUtil;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.PreferencesUtil;
 import com.example.qgchat.util.UltimateBar;
-import com.google.gson.Gson;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMClientListener;
 import com.hyphenate.EMContactListener;
@@ -82,7 +81,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +151,7 @@ public class AtyMain extends BaseActivity {
     private QGService.QGBinder mBinder = null;
     private DrawerAdapter drawerAdapter;
     private PreferencesUtil preferencesUtil;
+    private BroadcastReceiver broadcastReceiver;
     //侧滑菜单菜单项
     private List<DrawerList> drawerList = Arrays.asList(
             new DrawerList(R.drawable.ic_search_black_24dp, R.string.drawer_menu_search),
@@ -214,6 +213,8 @@ public class AtyMain extends BaseActivity {
         mLocationClient = new LocationClient(getApplicationContext());
         //注册监听函数
         mLocationClient.registerLocationListener(new MyLocationListener());
+
+        registerBroadcastReceiver();
 
         preferencesUtil = new PreferencesUtil(this);
 
@@ -440,97 +441,44 @@ public class AtyMain extends BaseActivity {
     };
 
     public class MyContactListener implements EMContactListener {
+
         @Override
-        public void onContactAdded(String username) {
-            refreshUIWithContacts();
+        public void onContactAdded(String s) {
+
         }
 
         @Override
-        public void onContactDeleted(final String username) {
-            refreshUIWithContacts();
+        public void onContactDeleted(String s) {
+
         }
 
         @Override
-        public void onContactInvited(final String username, String reason) {
-            DBInviteMessage new_friend = new DBInviteMessage();
-            new_friend.setStatus(DBInviteMessage.BEINVITEED);
-            new_friend.setReason(reason);
-            Date date = new Date();
-            new_friend.setTime(date.getTime());
-            new_friend.setFrom(username);
-            new_friend.save();
-            preferencesUtil.setUnreadMsgCount(preferencesUtil.getUnreadMsgCount() + 1);
-            refreshUIWithContacts();
-            EMMessage emMessage = EMMessage.createReceiveMessage(EMMessage.Type.TXT);
-            EaseUI.getInstance().getNotifier().setNotificationInfoProvider(new EaseNotifier.EaseNotificationInfoProvider() {
-                @Override
-                public String getDisplayedText(EMMessage message) {
-                    return username+"请求添加你为好友";
-                }
+        public void onContactInvited(String s, String s1) {
 
-                @Override
-                public String getLatestText(EMMessage message, int fromUsersNum, int messageNum) {
-                    return username+"请求添加你为好友";
-                }
-
-                @Override
-                public String getTitle(EMMessage message) {
-                    return "好友请求";
-                }
-
-                @Override
-                public int getSmallIcon(EMMessage message) {
-                    return 0;
-                }
-
-                @Override
-                public Intent getLaunchIntent(EMMessage message) {
-                    return new Intent(AtyMain.this, NewFriendsMsgActivity.class);
-                }
-            });
-            EaseUI.getInstance().getNotifier().onNewMsg(emMessage);
         }
 
         @Override
-        public void onFriendRequestAccepted(String username) {
-            DBInviteMessage new_friend = new DBInviteMessage();
-            new_friend.setStatus(DBInviteMessage.BEAGREED);
-            Date date = new Date();
-            new_friend.setTime(date.getTime());
-            new_friend.setFrom(username);
-            new_friend.save();
-            refreshUIWithContacts();
-            addFriend(preferencesUtil.getAccount(),username);
+        public void onFriendRequestAccepted(String s) {
+
         }
 
         @Override
-        public void onFriendRequestDeclined(String username) {
-            DBInviteMessage new_friend = new DBInviteMessage();
-            new_friend.setStatus(DBInviteMessage.BEREFUSED);
-            Date date = new Date();
-            new_friend.setTime(date.getTime());
-            new_friend.setFrom(username);
-            new_friend.save();
-        }
+        public void onFriendRequestDeclined(String s) {
 
+        }
     }
 
-    private void addFriend(String ownerAccount,String friendAccount) {
-        String url = HttpUtil.addFriendURL + "?ownerAccount=" + ownerAccount + "&friendAccount=" + friendAccount;
-        HttpUtil.sendOkHttpRequest(url, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
+    private void registerBroadcastReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(EaseConstant.ACTION_CONTACT_CHANAGED);
+        broadcastReceiver = new BroadcastReceiver() {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Message message = new Message();
-                String responseData = response.body().string();
-                Gson gson = new Gson();
-                StatusResponse statusResponse = gson.fromJson(responseData, StatusResponse.class);
+            public void onReceive(Context context, Intent intent) {
+                refreshUIWithContacts();
             }
-        });
+        };
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     /**
@@ -850,6 +798,7 @@ public class AtyMain extends BaseActivity {
         stopService(serviceIntent);
         unbindService(connection);
         EMClient.getInstance().chatManager().removeMessageListener(messageListener);
+        unregisterReceiver(broadcastReceiver);
     }
 
 }
