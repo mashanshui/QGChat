@@ -62,6 +62,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     compile 'com.zhihu.android:matisse:0.5.0-alpha4'
+    compile 'com.j256.ormlite:ormlite-android:5.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
     implementation project(':easeui')
