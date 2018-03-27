@@ -5,13 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,44 +22,41 @@ import com.example.qgchat.bean.UserBean;
 import com.example.qgchat.util.AccessNetwork;
 import com.example.qgchat.util.BeanUtil;
 import com.example.qgchat.util.HttpUtil;
-import com.example.qgchat.view.StateButton;
 import com.example.qgchat.util.UltimateBar;
+import com.example.qgchat.view.ClearWriteEditText;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
-import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
 public class AtyLogin extends BaseActivity {
-    @BindView(R.id.icon)
-    CircleImageView icon;
-    @BindView(R.id.toolBar)
-    Toolbar toolBar;
-    @BindView(R.id.btn_login)
-    StateButton btnLogin;
     @BindView(R.id.edt_account)
-    MaterialEditText edtAccount;
+    ClearWriteEditText edtAccount;
     @BindView(R.id.edt_password)
-    MaterialEditText edtPassword;
+    ClearWriteEditText edtPassword;
+    @BindView(R.id.btn_login)
+    Button btnLogin;
     @BindView(R.id.forget_password)
     TextView forgetPassword;
     @BindView(R.id.register)
     TextView register;
-    private String account=null;
-    private String password=null;
+    @BindView(R.id.icon)
+    ImageView icon;
+
+    private String account = null;
+    private String password = null;
     private SharedPreferences preferences;
     private static final int LOGIN_SUCCESS = 0;
     private static final int LOGIN_FAIL = 1;
 
-    Handler handler = new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == LOGIN_SUCCESS) {
@@ -79,11 +75,8 @@ public class AtyLogin extends BaseActivity {
         setContentView(R.layout.activity_aty_login);
         preferences = getSharedPreferences("qgchat", MODE_PRIVATE);
         UltimateBar ultimateBar = new UltimateBar(this);
-        ultimateBar.setColorBar(ContextCompat.getColor(this, R.color.colorPrimary));
+        ultimateBar.setImmersionBar();
         ButterKnife.bind(this);
-        setSupportActionBar(toolBar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
         edtAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
