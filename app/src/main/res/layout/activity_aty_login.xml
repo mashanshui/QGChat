@@ -26,8 +26,8 @@
 
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="91dip"
             android:src="@drawable/ic_account_circle_grey600_48dp" />
@@ -52,6 +52,7 @@
                     android:id="@+id/edt_account"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/rc_ed_public_service_search_selector"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:hint="帐号"
@@ -82,11 +83,11 @@
                 android:layout_marginTop="37dip"
                 android:orientation="horizontal">
 
-
                 <com.example.qgchat.view.ClearWriteEditText
                     android:id="@+id/edt_password"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/rc_ed_public_service_search_selector"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:hint="密码"
@@ -102,10 +103,8 @@
                     android:layout_alignRight="@+id/edt_password"
                     android:layout_centerVertical="true"
                     android:visibility="gone">
-
                 </FrameLayout>
             </RelativeLayout>
-
 
             <Button
                 android:id="@+id/btn_login"
@@ -118,7 +117,6 @@
                 android:text="登录"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp" />
-
 
         </LinearLayout>
     </LinearLayout>

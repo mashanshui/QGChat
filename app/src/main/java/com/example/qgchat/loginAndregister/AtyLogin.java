@@ -9,6 +9,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,6 +51,8 @@ public class AtyLogin extends BaseActivity {
     TextView register;
     @BindView(R.id.icon)
     ImageView icon;
+    @BindView(R.id.de_img_backgroud)
+    ImageView deImgBackgroud;
 
     private String account = null;
     private String password = null;
@@ -77,6 +81,13 @@ public class AtyLogin extends BaseActivity {
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setImmersionBar();
         ButterKnife.bind(this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Animation animation = AnimationUtils.loadAnimation(AtyLogin.this, R.anim.translate_anim);
+                deImgBackgroud.startAnimation(animation);
+            }
+        }, 200);
         edtAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -124,7 +135,6 @@ public class AtyLogin extends BaseActivity {
         switch (view.getId()) {
             case R.id.btn_login:
                 if (AccessNetwork.getNetworkState(this) != AccessNetwork.INTERNET_NONE) {
-                    showBufferDialog();
                     login();
                 } else {
                     setToast("找不到可用网络");
@@ -144,8 +154,19 @@ public class AtyLogin extends BaseActivity {
     }
 
     private void login() {
-        account = edtAccount.getText().toString();
-        password = edtPassword.getText().toString();
+        account = edtAccount.getText().toString().trim();
+        password = edtPassword.getText().toString().trim();
+        if (TextUtils.isEmpty(account)) {
+            edtAccount.setShakeAnimation();
+            setToast("请输入账号");
+            return;
+        }
+        if (TextUtils.isEmpty(account)) {
+            edtPassword.setShakeAnimation();
+            setToast("请输入密码");
+            return;
+        }
+        showBufferDialog();
         EMClient.getInstance().login(account, password, new EMCallBack() {
 
             @Override
