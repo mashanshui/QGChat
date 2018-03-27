@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/QGChat.iml" filepath="$PROJECT_DIR$/QGChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/QGChat.iml" filepath="$PROJECT_DIR$/.idea/QGChat.iml" />
+      <module fileurl="file://D:\AndroidStudioProject\QGChat\QGChat.iml" filepath="D:\AndroidStudioProject\QGChat\QGChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\AndroidStudioProject\QGChat\app\app.iml" filepath="D:\AndroidStudioProject\QGChat\app\app.iml" />
     </modules>
   </component>
 </project>
