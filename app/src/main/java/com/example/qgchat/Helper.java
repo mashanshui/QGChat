@@ -2,15 +2,12 @@ package com.example.qgchat;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Message;
 
 import com.example.qgchat.activity.NewFriendsMsgActivity;
-import com.example.qgchat.bean.StatusResponse;
 import com.example.qgchat.cache.UserCacheManager;
 import com.example.qgchat.db.DBInviteMessage;
 import com.example.qgchat.util.HttpUtil;
 import com.example.qgchat.util.PreferencesUtil;
-import com.google.gson.Gson;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
@@ -175,10 +172,10 @@ public class Helper {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message message = new Message();
-                String responseData = response.body().string();
-                Gson gson = new Gson();
-                StatusResponse statusResponse = gson.fromJson(responseData, StatusResponse.class);
+//                Message message = new Message();
+//                String responseData = response.body().string();
+//                Gson gson = new Gson();
+//                StatusResponse statusResponse = gson.fromJson(responseData, StatusResponse.class);
             }
         });
     }
