@@ -34,6 +34,7 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -50,7 +51,7 @@ public class AtyLogin extends BaseActivity {
     @BindView(R.id.register)
     TextView register;
     @BindView(R.id.icon)
-    ImageView icon;
+    CircleImageView icon;
     @BindView(R.id.de_img_backgroud)
     ImageView deImgBackgroud;
 
@@ -81,6 +82,7 @@ public class AtyLogin extends BaseActivity {
         UltimateBar ultimateBar = new UltimateBar(this);
         ultimateBar.setImmersionBar();
         ButterKnife.bind(this);
+        Glide.with(AtyLogin.this).load(R.drawable.de_bg).into(deImgBackgroud);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -161,7 +163,7 @@ public class AtyLogin extends BaseActivity {
             setToast("请输入账号");
             return;
         }
-        if (TextUtils.isEmpty(account)) {
+        if (TextUtils.isEmpty(password)) {
             edtPassword.setShakeAnimation();
             setToast("请输入密码");
             return;

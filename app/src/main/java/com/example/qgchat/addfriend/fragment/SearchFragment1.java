@@ -37,9 +37,9 @@ public class SearchFragment1 extends Fragment {
     private MaterialEditText edt_number;
     public static final int REQUEST_SUCCESS = 0;
     public static final int REQUEST_FAIL = 1;
-    public static final int INTERNET_FAIL=2;
-    private String ownerAccount=null;
-    private String friendAccount=null;
+    public static final int INTERNET_FAIL = 2;
+    private String ownerAccount = null;
+    private String friendAccount = null;
 
     public SearchFragment1() {
         // Required empty public constructor
@@ -50,10 +50,10 @@ public class SearchFragment1 extends Fragment {
         public void handleMessage(Message msg) {
             ((AtyAddFriend) getActivity()).dismissBufferDialog();
             if (msg.what == REQUEST_SUCCESS) {
-                EventBus.getDefault().post(new SearchFriendEvent(true,friendAccount));
+                EventBus.getDefault().post(new SearchFriendEvent(true, friendAccount));
             } else if (msg.what == REQUEST_FAIL) {
                 Log.e(TAG, "handleMessage: ");
-                String description=msg.obj.toString();
+                String description = msg.obj.toString();
                 Toast.makeText(getActivity(), description, Toast.LENGTH_SHORT).show();
             } else if (msg.what == INTERNET_FAIL) {
                 Toast.makeText(getActivity(), "网络异常", Toast.LENGTH_SHORT).show();
@@ -66,16 +66,16 @@ public class SearchFragment1 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.addfriend_fragment_search1, container, false);
-        StateButton btn_next= (StateButton) getActivity().findViewById(R.id.btn_next);
+        StateButton btn_next = (StateButton) getActivity().findViewById(R.id.btn_next);
         btn_next.setText("下一步");
-        ownerAccount=((AtyAddFriend)getActivity()).ownerAccount;
+        ownerAccount = ((AtyAddFriend) getActivity()).ownerAccount;
         edt_number = (MaterialEditText) view.findViewById(R.id.edt_number);
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((AtyAddFriend) getActivity()).hideSoftKeyboard();
                 friendAccount = edt_number.getText().toString();
-                if (!StringUtil.isEmpty(friendAccount,ownerAccount)) {
+                if (!StringUtil.isEmpty(friendAccount, ownerAccount)) {
                     ((AtyAddFriend) getActivity()).showBufferDialog();
                     //判断是否存在用户
                     checkFriend();
@@ -87,8 +87,11 @@ public class SearchFragment1 extends Fragment {
         return view;
     }
 
+    /**
+     * 判断用户是否可以添加
+     */
     private void checkFriend() {
-        String url=HttpUtil.checkFriendURL+"?ownerAccount="+ownerAccount+"&friendAccount="+friendAccount;
+        String url = HttpUtil.checkFriendURL + "?ownerAccount=" + ownerAccount + "&friendAccount=" + friendAccount;
         HttpUtil.sendOkHttpRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -100,23 +103,23 @@ public class SearchFragment1 extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 Message message = new Message();
-                String responseData=response.body().string();
-                Gson gson=new Gson();
-                StatusResponse statusResponse=gson.fromJson(responseData,StatusResponse.class);
-                Log.e(TAG, "onResponse: "+statusResponse.toString());
+                String responseData = response.body().string();
+                Gson gson = new Gson();
+                StatusResponse statusResponse = gson.fromJson(responseData, StatusResponse.class);
+                Log.e(TAG, "onResponse: " + statusResponse.toString());
                 if (statusResponse.getStatus().equals("ok")) {
                     message.what = REQUEST_SUCCESS;
                 } else if (statusResponse.getStatus().equals("fail")) {
-                    Log.e(TAG, "onResponse: "+statusResponse.getDescription());
+                    Log.e(TAG, "onResponse: " + statusResponse.getDescription());
                     message.what = REQUEST_FAIL;
-                    message.obj=statusResponse.getDescription();
+                    message.obj = statusResponse.getDescription();
                 }
                 handler.sendMessage(message);
             }
         });
     }
 
-    public class SearchFriendEvent{
+    public class SearchFriendEvent {
         public boolean isExist;
         public String friendAccount;
 
